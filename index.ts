@@ -1,28 +1,5 @@
-interface Color {
-  light: string;
-  dark: string;
-  hcDark: string;
-  hcLight: string;
-}
-
-interface Theme {
-  ansiBlack: Color;
-  ansiRed: Color;
-  ansiGreen: Color;
-  ansiYellow: Color;
-  ansiBlue: Color;
-  ansiMagenta: Color;
-  ansiCyan: Color;
-  ansiWhite: Color;
-  ansiBrightBlack: Color;
-  ansiBrightRed: Color;
-  ansiBrightGreen: Color;
-  ansiBrightYellow: Color;
-  ansiBrightBlue: Color;
-  ansiBrightMagenta: Color;
-  ansiBrightCyan: Color;
-  ansiBrightWhite: Color;
-}
+import { type Theme } from './theme';
+import { exportForIterm2 } from './iterm2';
 
 const base: Theme = {
   ansiBlack: {
@@ -122,3 +99,5 @@ const base: Theme = {
     hcLight: '#a5a5a5',
   },
 };
+
+await Bun.write(Bun.file('Base.itermcolors'), exportForIterm2(base));
