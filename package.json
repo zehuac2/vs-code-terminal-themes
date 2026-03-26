@@ -4,9 +4,11 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "6.0.2"
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "dependencies": {
+    "@plist/common": "1.1.0",
+    "@plist/plist": "1.0.0"
   }
 }
