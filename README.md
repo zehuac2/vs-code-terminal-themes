@@ -14,3 +14,5 @@ VS Code's terminal colors appear to be defined in
 
 Individual themes can override those defaults. Theme definitions live in
 [extensions/](https://github.com/microsoft/vscode/blob/main/extensions/).
+
+iTerm2's color theme schema can be found at [plists/ColorPresets.plist](https://github.com/gnachman/iTerm2/blob/master/plists/ColorPresets.plist)
