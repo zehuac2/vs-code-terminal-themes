@@ -4,7 +4,7 @@ const [, , ...args] = process.argv;
 const fileName = args[0];
 
 if (args.length !== 1 || !fileName) {
-  console.error('Usage: bun run inspect.ts <file>');
+  console.error('Usage: bun run src/inspect.ts <file>');
   process.exit(1);
 }
 
