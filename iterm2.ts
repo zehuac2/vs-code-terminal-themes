@@ -1,4 +1,10 @@
-import { type Theme, type NamedThemeColor, NAMED_THEME_COLOR_TO_INDEX_THEME_COLOR } from './theme';
+import {
+  ANSI_THEME_COLOR_KEYS,
+  ANSI_THEME_COLOR_TO_INDEX,
+  ITERM2_EXTRA_COLOR_KEYS,
+  type ColorValue,
+  type ResolvedTheme,
+} from './theme';
 import { type Dictionary, PlistFormat } from '@plist/common';
 import { serialize } from '@plist/plist';
 
@@ -11,6 +17,21 @@ interface ITerm2Color extends Dictionary {
 }
 
 type ITerm2ColorPreset = Dictionary;
+
+const CORE_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
+  background: 'Background Color',
+  foreground: 'Foreground Color',
+  selectionBackground: 'Selection Color',
+  selectionForeground: 'Selected Text Color',
+  cursor: 'Cursor Color',
+  cursorText: 'Cursor Text Color',
+} as const;
+
+const EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
+  bold: 'Bold Color',
+  link: 'Link Color',
+  underline: 'Underline Color',
+} as const;
 
 function convertColor(color: string): ITerm2Color {
   const rgba = Bun.color(color, '{rgba}');
@@ -28,17 +49,43 @@ function convertColor(color: string): ITerm2Color {
   };
 }
 
-export function exportForIterm2(theme: Theme): string {
+export function exportForIterm2(theme: ResolvedTheme): string {
   const preset: ITerm2ColorPreset = {};
 
-  (Object.keys(theme) as NamedThemeColor[]).forEach((colorName) => {
-    const color = theme[colorName];
-    const colorIndex = NAMED_THEME_COLOR_TO_INDEX_THEME_COLOR[colorName];
+  const addColor = (colorName: string, colorValue: ColorValue) => {
+    preset[colorName] = convertColor(colorValue.dark);
+    preset[`${colorName} (Light)`] = convertColor(colorValue.light);
+    preset[`${colorName} (Dark)`] = convertColor(colorValue.dark);
+  };
 
-    preset[`Ansi ${colorIndex} Color`] = convertColor(color.dark);
-    preset[`Ansi ${colorIndex} Color (Light)`] = convertColor(color.light);
-    preset[`Ansi ${colorIndex} Color (Darl)`] = convertColor(color.dark);
-  });
+  for (const colorKey of ANSI_THEME_COLOR_KEYS) {
+    const colorIndex = ANSI_THEME_COLOR_TO_INDEX[colorKey];
+
+    addColor(`Ansi ${colorIndex} Color`, theme.colors[colorKey]);
+  }
+
+  for (const [themeColorName, iterm2ColorName] of Object.entries(
+    CORE_ITERM2_COLOR_NAME_BY_THEME_COLOR,
+  )) {
+    const colorValue =
+      theme.colors[themeColorName as keyof typeof CORE_ITERM2_COLOR_NAME_BY_THEME_COLOR];
+
+    if (!colorValue) {
+      continue;
+    }
+
+    addColor(iterm2ColorName, colorValue);
+  }
+
+  for (const themeColorName of ITERM2_EXTRA_COLOR_KEYS) {
+    const colorValue = theme.iterm2.colors[themeColorName];
+
+    if (!colorValue) {
+      continue;
+    }
+
+    addColor(EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR[themeColorName], colorValue);
+  }
 
   return serialize(preset, PlistFormat.XML);
 }
