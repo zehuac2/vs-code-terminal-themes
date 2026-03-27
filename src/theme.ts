@@ -74,7 +74,10 @@ export function defineThemes<const T extends Record<string, ThemeDefinition>>(th
   return themes;
 }
 
-function mergeColorValue(parent: ColorValue | undefined, override: ColorOverride | undefined): ColorValue | undefined {
+function mergeColorValue(
+  parent: ColorValue | undefined,
+  override: ColorOverride | undefined,
+): ColorValue | undefined {
   if (!parent && !override) {
     return undefined;
   }
@@ -105,6 +108,71 @@ function assertResolvedColorValue(
   return colorValue;
 }
 
+function mapDefined<const T, U>(
+  values: readonly T[],
+  mapValue: (value: T) => U | undefined,
+): U[] {
+  return values.flatMap((value) => {
+    const mappedValue = mapValue(value);
+    return mappedValue === undefined ? [] : [mappedValue];
+  });
+}
+
+function resolveRequiredOrOptionalColor(
+  themeName: string,
+  colorPath: string,
+  colorValue: ColorValue | undefined,
+  isRequired: boolean,
+): ColorValue | undefined {
+  if (!colorValue) {
+    if (isRequired) {
+      throw new Error(`Theme "${themeName}" is missing required color "${colorPath}".`);
+    }
+
+    return undefined;
+  }
+
+  return assertResolvedColorValue(themeName, colorPath, colorValue);
+}
+
+function resolveThemeColorEntries(
+  themeName: string,
+  parent: ResolvedTheme | undefined,
+  definition: ThemeDefinition,
+): Array<[ThemeColorKey, ColorValue]> {
+  return mapDefined(THEME_COLOR_KEYS, (colorKey) => {
+    const mergedColorValue = mergeColorValue(parent?.colors[colorKey], definition.colors?.[colorKey]);
+    const resolvedColorValue = resolveRequiredOrOptionalColor(
+      themeName,
+      `colors.${colorKey}`,
+      mergedColorValue,
+      REQUIRED_THEME_COLOR_KEYS.includes(colorKey as RequiredThemeColorKey),
+    );
+
+    return resolvedColorValue ? [colorKey, resolvedColorValue] : undefined;
+  });
+}
+
+function resolveIterm2ColorEntries(
+  themeName: string,
+  parent: ResolvedTheme | undefined,
+  definition: ThemeDefinition,
+): Array<[Iterm2ExtraColorKey, ColorValue]> {
+  return mapDefined(ITERM2_EXTRA_COLOR_KEYS, (colorKey) => {
+    const mergedColorValue = mergeColorValue(
+      parent?.iterm2.colors[colorKey],
+      definition.iterm2?.colors?.[colorKey],
+    );
+
+    return mergedColorValue
+      ? [
+          colorKey,
+          assertResolvedColorValue(themeName, `iterm2.colors.${colorKey}`, mergedColorValue),
+        ]
+      : undefined;
+  });
+}
+
 export function resolveTheme(
   themes: Record<string, ThemeDefinition>,
   themeName: string,
@@ -132,46 +200,12 @@ export function resolveTheme(
     activeThemeNames.add(currentThemeName);
 
     const parent = definition.extends ? resolveByName(definition.extends) : undefined;
-    const resolvedColors: Partial<Record<ThemeColorKey, ColorValue>> = {};
-    const resolvedIterm2Colors: Partial<Record<Iterm2ExtraColorKey, ColorValue>> = {};
-
-    for (const colorKey of THEME_COLOR_KEYS) {
-      const mergedColorValue = mergeColorValue(parent?.colors[colorKey], definition.colors?.[colorKey]);
-      const isRequiredColor = REQUIRED_THEME_COLOR_KEYS.includes(colorKey as RequiredThemeColorKey);
-
-      if (mergedColorValue) {
-        resolvedColors[colorKey] = assertResolvedColorValue(
-          currentThemeName,
-          `colors.${colorKey}`,
-          mergedColorValue,
-        );
-        continue;
-      }
-
-      if (isRequiredColor) {
-        throw new Error(`Theme "${currentThemeName}" is missing required color "colors.${colorKey}".`);
-      }
-
-    }
-
-    for (const colorKey of ITERM2_EXTRA_COLOR_KEYS) {
-      const mergedColorValue = mergeColorValue(parent?.iterm2.colors[colorKey], definition.iterm2?.colors?.[colorKey]);
-
-      if (!mergedColorValue) {
-        continue;
-      }
-
-      resolvedIterm2Colors[colorKey] = assertResolvedColorValue(
-        currentThemeName,
-        `iterm2.colors.${colorKey}`,
-        mergedColorValue,
-      );
-    }
-
     const resolvedTheme: ResolvedTheme = {
-      colors: resolvedColors as ResolvedTheme['colors'],
+      colors: Object.fromEntries(
+        resolveThemeColorEntries(currentThemeName, parent, definition),
+      ) as ResolvedTheme['colors'],
       iterm2: {
-        colors: resolvedIterm2Colors,
+        colors: Object.fromEntries(resolveIterm2ColorEntries(currentThemeName, parent, definition)),
       },
     };
 
