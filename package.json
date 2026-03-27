@@ -10,6 +10,6 @@
   "dependencies": {
     "@plist/common": "1.1.0",
     "@plist/plist": "1.0.0",
-    "color-blend": "^4.0.0"
+    "color-blend": "4.0.0"
   }
 }
