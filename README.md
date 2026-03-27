@@ -7,6 +7,19 @@ Recreate VS Code's built-in terminal themes in other terminals.
 - Supported terminals
   - iTerm2
 
+## Theme Definitions
+
+Themes are declared in TypeScript and can inherit from another theme with
+`extends`.
+
+- `colors` uses VS Code-style terminal keys such as ANSI colors, `background`,
+  `foreground`, `selectionBackground`, `selectionForeground`, `cursor`, and
+  `cursorText`
+- `iterm2.colors` is reserved for iTerm2-only extras such as `bold`, `link`, and
+  `underline`
+- child themes can override only the variants they need; resolution fills the
+  rest from the parent
+
 ## Methodology
 
 VS Code's terminal colors appear to be defined in
@@ -15,4 +28,5 @@ VS Code's terminal colors appear to be defined in
 Individual themes can override those defaults. Theme definitions live in
 [extensions/](https://github.com/microsoft/vscode/blob/main/extensions/).
 
-iTerm2's color theme schema can be found at [plists/ColorPresets.plist](https://github.com/gnachman/iTerm2/blob/master/plists/ColorPresets.plist)
+iTerm2's color theme schema can be found at
+[plists/ColorPresets.plist](https://github.com/gnachman/iTerm2/blob/master/plists/ColorPresets.plist)
