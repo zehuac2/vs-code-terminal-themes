@@ -3,11 +3,14 @@
 Recreate VS Code's built-in terminal themes in other terminals.
 
 - Supported themes
-  - [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
+  - VS Code, sourced from
+    - [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
+    - [TODO: 2026 Light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-light.json)
 - Supported terminals
   - iTerm2
 
-Run `bun run build` to generate terminal profiles in `generated/`.
+Download color profiles in [releases](releases). Run `bun run build` to generate
+terminal profiles in `generated/`.
 
 ## Theme Definitions
 
