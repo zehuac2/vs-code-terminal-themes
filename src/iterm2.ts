@@ -18,6 +18,8 @@ interface ITerm2Color extends Dictionary {
 }
 
 type ITerm2ColorPreset = Dictionary;
+export type ITerm2ExportObject = ITerm2ColorPreset;
+export type ITerm2ExportFormat = 'xml' | 'object';
 
 const CORE_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
   background: 'Background Color',
@@ -81,7 +83,13 @@ function compactEntries<T>(entries: Array<T | undefined>): T[] {
   return entries.filter((entry): entry is T => entry !== undefined);
 }
 
-export function exportForIterm2(theme: ResolvedTheme): string {
+export function exportForIterm2(theme: ResolvedTheme): string;
+export function exportForIterm2(theme: ResolvedTheme, format: 'xml'): string;
+export function exportForIterm2(theme: ResolvedTheme, format: 'object'): ITerm2ExportObject;
+export function exportForIterm2(
+  theme: ResolvedTheme,
+  format: ITerm2ExportFormat = 'xml',
+): string | ITerm2ExportObject {
   const convertLightColor = createColorConverter(theme.colors.background.light);
   const convertDarkColor = createColorConverter(theme.colors.background.dark);
 
@@ -126,7 +134,11 @@ export function exportForIterm2(theme: ResolvedTheme): string {
     ...ansiEntries,
     ...coreEntries,
     ...extraEntries,
-  ]) as ITerm2ColorPreset;
+  ]) as ITerm2ExportObject;
+
+  if (format === 'object') {
+    return preset;
+  }
 
   return serialize(preset, PlistFormat.XML);
 }
