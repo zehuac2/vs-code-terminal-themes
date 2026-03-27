@@ -53,7 +53,10 @@ describe('exportForIterm2', () => {
 
   test('composites translucent colors onto the active theme background', () => {
     const resolvedTheme = resolveTheme(builtInThemes, 'vsCode');
-    const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, Record<string, number>>;
+    const plist = parse(exportForIterm2(resolvedTheme)) as Record<
+      string,
+      Record<string, number | string>
+    >;
     const selectionColor = plist['Selection Color'];
 
     expect(selectionColor).toEqual({
