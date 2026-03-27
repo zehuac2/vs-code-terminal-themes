@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import { defineThemes, resolveTheme } from './theme';
 import { themes as builtInThemes } from './themes';
 
 describe('resolveTheme', () => {
-  test('merges inherited colors and preserves non-overridden variants', () => {
+  it('merges inherited colors and preserves non-overridden variants', () => {
     const themes = defineThemes({
       ...builtInThemes,
       child: {
@@ -40,7 +40,7 @@ describe('resolveTheme', () => {
     expect(resolvedTheme.iterm2.colors.bold?.dark).toBe('#bbbbbb');
   });
 
-  test('rejects unknown parent themes', () => {
+  it('rejects unknown parent themes', () => {
     const themes = defineThemes({
       broken: {
         extends: 'missing',
@@ -50,7 +50,7 @@ describe('resolveTheme', () => {
     expect(() => resolveTheme(themes, 'broken')).toThrow('Theme "missing" is not defined.');
   });
 
-  test('rejects inheritance cycles', () => {
+  it('rejects inheritance cycles', () => {
     const themes = defineThemes({
       first: {
         extends: 'second',
@@ -63,7 +63,7 @@ describe('resolveTheme', () => {
     expect(() => resolveTheme(themes, 'first')).toThrow('Theme inheritance cycle detected');
   });
 
-  test('requires all required colors after resolution', () => {
+  it('requires all required colors after resolution', () => {
     const themes = defineThemes({
       broken: {
         colors: {
@@ -80,7 +80,7 @@ describe('resolveTheme', () => {
     expect(() => resolveTheme(themes, 'broken')).toThrow('missing required color');
   });
 
-  test('resolves the built-in vsCodeDark variant with requested overrides', () => {
+  it('resolves the built-in vsCodeDark variant with requested overrides', () => {
     const resolvedTheme = resolveTheme(builtInThemes, 'vsCode');
 
     expect(resolvedTheme.colors.background.dark).toBe('#191A1B');

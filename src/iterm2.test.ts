@@ -1,11 +1,11 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import { parse } from '@plist/plist';
 import { exportForIterm2 } from './iterm2';
 import { defineThemes, resolveTheme } from './theme';
 import { themes as builtInThemes } from './themes';
 
 describe('exportForIterm2', () => {
-  test('exports core terminal colors, ansi colors, and iTerm2 extras', () => {
+  it('exports core terminal colors, ansi colors, and iTerm2 extras', () => {
     const themes = defineThemes({
       ...builtInThemes,
       child: {
@@ -51,7 +51,7 @@ describe('exportForIterm2', () => {
     expect(plist['Underline Color']).toBeUndefined();
   });
 
-  test('composites translucent colors onto the active theme background', () => {
+  it('composites translucent colors onto the active theme background', () => {
     const resolvedTheme = resolveTheme(builtInThemes, 'vsCode');
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<
       string,
