@@ -7,6 +7,8 @@ Recreate VS Code's built-in terminal themes in other terminals.
 - Supported terminals
   - iTerm2
 
+Run `bun run build` to generate terminal profiles in `generated/`.
+
 ## Theme Definitions
 
 Themes are declared in TypeScript and can inherit from another theme with
