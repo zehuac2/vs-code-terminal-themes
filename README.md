@@ -9,8 +9,9 @@ Recreate VS Code's built-in terminal themes in other terminals.
 - Supported terminals
   - iTerm2
 
-Download color profiles in [releases](releases). Run `bun run build` to generate
-terminal profiles in `generated/`.
+Download color profiles in
+[releases](https://github.com/zehuac2/vs-code-terminal-themes/releases). Run
+`bun run build` to generate terminal profiles in `generated/`.
 
 ## Theme Definitions
 
