@@ -1,3 +1,6 @@
+import { type Dictionary, PlistFormat } from '@plist/common';
+import { serialize } from '@plist/plist';
+import { normal } from 'color-blend';
 import {
   ANSI_THEME_COLOR_KEYS,
   ANSI_THEME_COLOR_TO_INDEX,
@@ -5,8 +8,6 @@ import {
   type ColorValue,
   type ResolvedTheme,
 } from './theme';
-import { type Dictionary, PlistFormat } from '@plist/common';
-import { serialize } from '@plist/plist';
 
 interface ITerm2Color extends Dictionary {
   'Alpha Component': number;
@@ -33,29 +34,43 @@ const EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
   underline: 'Underline Color',
 } as const;
 
-function convertColor(color: string): ITerm2Color {
-  const rgba = Bun.color(color, '{rgba}');
-
-  if (!rgba) {
-    throw new Error(`Invalid color value: ${color}`);
+/**
+ * iTerm2 colors are effectively opaque, so flatten any alpha onto the theme background.
+ */
+function createColorConverter(backgroundColor: string): (color: string) => ITerm2Color {
+  const backgroundRgba = Bun.color(backgroundColor, '{rgba}');
+  if (!backgroundRgba) {
+    throw new Error(`Invalid background color value: ${backgroundColor}`);
   }
 
-  return {
-    'Alpha Component': rgba.a,
-    'Blue Component': rgba.b / 255,
-    'Color Space': 'sRGB',
-    'Green Component': rgba.g / 255,
-    'Red Component': rgba.r / 255,
+  return (color: string): ITerm2Color => {
+    const rgba = Bun.color(color, '{rgba}');
+
+    if (!rgba) {
+      throw new Error(`Invalid color value: ${color}`);
+    }
+
+    const composited = normal(backgroundRgba, rgba);
+
+    return {
+      'Alpha Component': 1,
+      'Blue Component': composited.b / 255,
+      'Color Space': 'sRGB',
+      'Green Component': composited.g / 255,
+      'Red Component': composited.r / 255,
+    };
   };
 }
 
 export function exportForIterm2(theme: ResolvedTheme): string {
   const preset: ITerm2ColorPreset = {};
+  const convertLightColor = createColorConverter(theme.colors.background.light);
+  const convertDarkColor = createColorConverter(theme.colors.background.dark);
 
   const addColor = (colorName: string, colorValue: ColorValue) => {
-    preset[colorName] = convertColor(colorValue.dark);
-    preset[`${colorName} (Light)`] = convertColor(colorValue.light);
-    preset[`${colorName} (Dark)`] = convertColor(colorValue.dark);
+    preset[colorName] = convertDarkColor(colorValue.dark);
+    preset[`${colorName} (Light)`] = convertLightColor(colorValue.light);
+    preset[`${colorName} (Dark)`] = convertDarkColor(colorValue.dark);
   };
 
   for (const colorKey of ANSI_THEME_COLOR_KEYS) {

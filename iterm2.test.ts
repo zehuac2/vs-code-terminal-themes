@@ -50,4 +50,18 @@ describe('exportForIterm2', () => {
     expect(plist['Bold Color']).toBeDefined();
     expect(plist['Underline Color']).toBeUndefined();
   });
+
+  test('composites translucent colors onto the active theme background', () => {
+    const resolvedTheme = resolveTheme(builtInThemes, 'vsCode');
+    const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, Record<string, number>>;
+    const selectionColor = plist['Selection Color'];
+
+    expect(selectionColor).toEqual({
+      'Alpha Component': 1,
+      'Blue Component': 59 / 255,
+      'Color Space': 'sRGB',
+      'Green Component': 50 / 255,
+      'Red Component': 31 / 255,
+    });
+  });
 });
