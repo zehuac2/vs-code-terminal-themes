@@ -3,9 +3,18 @@
 Recreate VS Code's built-in terminal themes in other terminals.
 
 - Supported themes
-  - VS Code, sourced from
+  - VS Code Classic, sourced from
+    - [Dark (Visual Studio)](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_vs.json)
+    - [Light (Visual Studio)](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_vs.json)
+  - VS Code Plus, sourced from
+    - [Dark+](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_plus.json)
+    - [Light+](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_plus.json)
+  - VS Code Modern, sourced from
+    - [Dark Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json)
+    - [Light Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_modern.json)
+  - VS Code, sourced from the 2026 family
     - [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
-    - [TODO: 2026 Light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-light.json)
+    - [2026 Light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-light.json)
 - Supported terminals
   - iTerm2
 
