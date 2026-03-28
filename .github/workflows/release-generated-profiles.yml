@@ -26,7 +26,7 @@ jobs:
         run: bun test
 
       - name: Generate profiles
-        run: bun run index.ts
+        run: bun run build
 
       - name: Upload profiles to release
         uses: softprops/action-gh-release@v2
