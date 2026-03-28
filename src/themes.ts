@@ -138,26 +138,60 @@ export const themes = defineThemes({
       },
     },
   },
+  vsCodeClassic: {
+    displayName: 'VS Code Classic',
+    extends: 'base',
+    colors: {
+      selectionBackground: {
+        light: '#E5EBF1',
+        dark: '#3A3D41',
+      },
+    },
+  },
+  vsCodePlus: {
+    displayName: 'VS Code Plus',
+    extends: 'vsCodeClassic',
+  },
+  vsCodeModern: {
+    displayName: 'VS Code Modern',
+    extends: 'vsCodePlus',
+    colors: {
+      foreground: {
+        light: '#3B3B3B',
+        dark: '#CCCCCC',
+      },
+      cursor: {
+        light: '#005FB8',
+      },
+      selectionBackground: {
+        light: '#E5EBF1',
+      },
+      tabActiveBorder: {
+        light: '#005FB8',
+        dark: '#0078D4',
+        hcDark: '#0078D4',
+        hcLight: '#005FB8',
+      },
+    },
+  },
   vsCode: {
     displayName: 'VS Code',
-    extends: 'base',
+    extends: 'vsCodeModern',
     colors: {
       background: {
         dark: '#191A1B',
-        hcDark: '#191A1B',
       },
       selectionBackground: {
         light: '#0069CC26',
         dark: '#3994BC33',
-        hcDark: '#3994BC33',
       },
       cursor: {
+        light: '#202020',
         dark: '#bfbfbf',
-        hcDark: '#bfbfbf',
       },
       cursorText: {
+        light: '#FFFFFF',
         dark: '#191A1B',
-        hcDark: '#191A1B',
       },
       border: {
         light: '#2A2B2CFF',
@@ -166,10 +200,7 @@ export const themes = defineThemes({
         hcLight: '#2A2B2CFF',
       },
       tabActiveBorder: {
-        light: '#3994BC00',
         dark: '#3994BC00',
-        hcDark: '#3994BC00',
-        hcLight: '#3994BC00',
       },
     },
   },
