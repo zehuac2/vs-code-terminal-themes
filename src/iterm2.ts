@@ -1,6 +1,6 @@
 import { type Dictionary, PlistFormat } from '@plist/common';
 import { serialize } from '@plist/plist';
-import { normal } from 'color-blend';
+import { compositeColor } from './color';
 import {
   ANSI_THEME_COLOR_KEYS,
   ANSI_THEME_COLOR_TO_INDEX,
@@ -42,19 +42,8 @@ type ITerm2PresetEntry = [string, ITerm2Color];
  * iTerm2 colors are effectively opaque, so flatten any alpha onto the theme background.
  */
 function createColorConverter(backgroundColor: string): (color: string) => ITerm2Color {
-  const backgroundRgba = Bun.color(backgroundColor, '{rgba}');
-  if (!backgroundRgba) {
-    throw new Error(`Invalid background color value: ${backgroundColor}`);
-  }
-
   return (color: string): ITerm2Color => {
-    const rgba = Bun.color(color, '{rgba}');
-
-    if (!rgba) {
-      throw new Error(`Invalid color value: ${color}`);
-    }
-
-    const composited = normal(backgroundRgba, rgba);
+    const composited = compositeColor(backgroundColor, color);
 
     return {
       'Alpha Component': 1,
