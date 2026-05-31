@@ -6,7 +6,7 @@ import { themes as builtInThemes } from './themes';
 
 describe('exportForWarp', () => {
   it('exports core colors and normal and bright ANSI colors', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, 'vsCode');
+    const resolvedTheme = resolveTheme(builtInThemes, '2026 Dark');
     const yaml = exportForWarp(resolvedTheme, { name: 'VS Code Dark', variant: 'dark' });
     const warpTheme = parse(yaml) as WarpExportObject;
 
@@ -24,7 +24,7 @@ describe('exportForWarp', () => {
     const themes = defineThemes({
       ...builtInThemes,
       child: {
-        extends: 'base',
+        extends: '2026 Dark',
         colors: {
           ansiBlue: {
             dark: '#3994BC33',
