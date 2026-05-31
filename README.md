@@ -17,6 +17,7 @@ Recreate VS Code's built-in terminal themes in other terminals.
     - [2026 Light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-light.json)
 - Supported terminals
   - iTerm2
+  - Warp
 
 Download color profiles in
 [releases](https://github.com/zehuac2/vs-code-terminal-themes/releases). Run
@@ -45,3 +46,6 @@ Individual themes can override those defaults. Theme definitions live in
 
 iTerm2's color theme schema can be found at
 [plists/ColorPresets.plist](https://github.com/gnachman/iTerm2/blob/master/plists/ColorPresets.plist)
+
+Warp's custom theme schema can be found in
+[Custom Themes](https://docs.warp.dev/appearance/custom-themes).
