@@ -9,7 +9,7 @@ describe('exportForIterm2', () => {
     const themes = defineThemes({
       ...builtInThemes,
       child: {
-        extends: 'Dark+',
+        extends: 'Plus',
         colors: {
           ansiBlue: {
             dark: '#010203',
@@ -52,7 +52,7 @@ describe('exportForIterm2', () => {
   });
 
   it('composites translucent colors onto the active theme background', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, '2026 Dark');
+    const resolvedTheme = resolveTheme(builtInThemes, '2026');
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<
       string,
       Record<string, number | string>
