@@ -2342,7 +2342,7 @@ exports[`Warp preset snapshots 2026 light 1`] = `
   "cursor": "#202020",
   "details": "lighter",
   "foreground": "#3B3B3B",
-  "name": "2026 Light",
+  "name": "VSCode 2026 Light",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2375,7 +2375,7 @@ exports[`Warp preset snapshots 2026 dark 1`] = `
   "cursor": "#BFBFBF",
   "details": "darker",
   "foreground": "#CCCCCC",
-  "name": "2026 Dark",
+  "name": "VSCode 2026 Dark",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2408,7 +2408,7 @@ exports[`Warp preset snapshots Visual Studio light 1`] = `
   "cursor": "#000000",
   "details": "lighter",
   "foreground": "#333333",
-  "name": "Visual Studio Light",
+  "name": "VSCode Visual Studio Light",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2441,7 +2441,7 @@ exports[`Warp preset snapshots Visual Studio dark 1`] = `
   "cursor": "#AEAFAD",
   "details": "darker",
   "foreground": "#CCCCCC",
-  "name": "Visual Studio Dark",
+  "name": "VSCode Visual Studio Dark",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2474,7 +2474,7 @@ exports[`Warp preset snapshots Plus light 1`] = `
   "cursor": "#000000",
   "details": "lighter",
   "foreground": "#333333",
-  "name": "Plus Light",
+  "name": "VSCode Plus Light",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2507,7 +2507,7 @@ exports[`Warp preset snapshots Plus dark 1`] = `
   "cursor": "#AEAFAD",
   "details": "darker",
   "foreground": "#CCCCCC",
-  "name": "Plus Dark",
+  "name": "VSCode Plus Dark",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2540,7 +2540,7 @@ exports[`Warp preset snapshots Modern light 1`] = `
   "cursor": "#005FB8",
   "details": "lighter",
   "foreground": "#3B3B3B",
-  "name": "Modern Light",
+  "name": "VSCode Modern Light",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2573,7 +2573,7 @@ exports[`Warp preset snapshots Modern dark 1`] = `
   "cursor": "#AEAFAD",
   "details": "darker",
   "foreground": "#CCCCCC",
-  "name": "Modern Dark",
+  "name": "VSCode Modern Dark",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2606,7 +2606,7 @@ exports[`Warp preset snapshots High Contrast light 1`] = `
   "cursor": "#0F4A85",
   "details": "lighter",
   "foreground": "#292929",
-  "name": "High Contrast Light",
+  "name": "VSCode High Contrast Light",
   "terminal_colors": {
     "bright": {
       "black": "#666666",
@@ -2639,7 +2639,7 @@ exports[`Warp preset snapshots High Contrast dark 1`] = `
   "cursor": "#FFFFFF",
   "details": "darker",
   "foreground": "#FFFFFF",
-  "name": "High Contrast Dark",
+  "name": "VSCode High Contrast Dark",
   "terminal_colors": {
     "bright": {
       "black": "#7F7F7F",
