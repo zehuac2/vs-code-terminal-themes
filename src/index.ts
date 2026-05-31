@@ -2,6 +2,7 @@ import { resolveTheme } from './theme';
 import { exportForIterm2 } from './iterm2';
 import { themes } from './themes';
 import { exportForWarp, WARP_COLOR_VARIANTS } from './warp';
+import { mkdir, rm } from 'node:fs/promises';
 
 const GENERATED_DIR = 'generated';
 
@@ -10,7 +11,8 @@ const WARP_VARIANT_DISPLAY_NAMES = {
   light: 'Light',
 } as const;
 
-await Bun.$`mkdir -p ${GENERATED_DIR}`;
+await rm(GENERATED_DIR, { force: true, recursive: true });
+await mkdir(GENERATED_DIR, { recursive: true });
 
 for (const [themeName, definition] of Object.entries(themes)) {
   const theme = resolveTheme(themes, themeName);

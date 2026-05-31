@@ -111,89 +111,76 @@ const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> =
   },
 };
 
-function color(value: string): ColorOverride {
+function pairedColor(light: string, dark: string): ColorOverride {
   return {
-    light: value,
-    dark: value,
-    hcDark: value,
-    hcLight: value,
+    light,
+    dark,
+    hcDark: dark,
+    hcLight: light,
   };
 }
 
-function defaultColors(kind: ThemeKind): ThemeColors {
+function pairedDefaultColors(lightKind: ThemeKind, darkKind: ThemeKind): ThemeColors {
   return Object.fromEntries(
-    Object.entries(DEFAULT_COLORS_BY_KIND[kind]).map(([key, value]) => [key, color(value)]),
+    Object.keys(DEFAULT_COLORS_BY_KIND[lightKind]).map((key) => {
+      const colorKey = key as ThemeColorKey;
+      return [
+        colorKey,
+        pairedColor(
+          DEFAULT_COLORS_BY_KIND[lightKind][colorKey],
+          DEFAULT_COLORS_BY_KIND[darkKind][colorKey],
+        ),
+      ];
+    }),
   ) as ThemeColors;
 }
 
 export const themes = defineThemes({
-  'Dark (Visual Studio)': {
-    displayName: 'Dark (Visual Studio)',
+  'Visual Studio': {
+    displayName: 'Visual Studio',
     colors: {
-      ...defaultColors('dark'),
-      selectionBackground: color('#3A3D41'),
+      ...pairedDefaultColors('light', 'dark'),
+      selectionBackground: pairedColor('#E5EBF1', '#3A3D41'),
     },
   },
-  'Light (Visual Studio)': {
-    displayName: 'Light (Visual Studio)',
+  Plus: {
+    displayName: 'Plus',
+    extends: 'Visual Studio',
+  },
+  Modern: {
+    displayName: 'Modern',
+    extends: 'Plus',
     colors: {
-      ...defaultColors('light'),
-      selectionBackground: color('#E5EBF1'),
+      foreground: pairedColor('#3B3B3B', '#CCCCCC'),
+      cursor: {
+        light: '#005FB8',
+      },
+      selectionBackground: {
+        light: '#E5EBF1',
+      },
+      tabActiveBorder: pairedColor('#005FB8', '#0078D4'),
     },
   },
-  'Dark+': {
-    displayName: 'Dark+',
-    extends: 'Dark (Visual Studio)',
+  'High Contrast': {
+    displayName: 'High Contrast',
+    colors: pairedDefaultColors('hcLight', 'hcDark'),
   },
-  'Light+': {
-    displayName: 'Light+',
-    extends: 'Light (Visual Studio)',
-  },
-  'Dark Modern': {
-    displayName: 'Dark Modern',
-    extends: 'Dark+',
+  '2026': {
+    displayName: '2026',
+    extends: 'Modern',
     colors: {
-      foreground: color('#CCCCCC'),
-      tabActiveBorder: color('#0078D4'),
-    },
-  },
-  'Light Modern': {
-    displayName: 'Light Modern',
-    extends: 'Light+',
-    colors: {
-      foreground: color('#3B3B3B'),
-      cursor: color('#005FB8'),
-      selectionBackground: color('#E5EBF1'),
-      tabActiveBorder: color('#005FB8'),
-    },
-  },
-  'Dark High Contrast': {
-    displayName: 'Dark High Contrast',
-    colors: defaultColors('hcDark'),
-  },
-  'Light High Contrast': {
-    displayName: 'Light High Contrast',
-    colors: defaultColors('hcLight'),
-  },
-  '2026 Dark': {
-    displayName: '2026 Dark',
-    extends: 'Dark Modern',
-    colors: {
-      background: color('#191A1B'),
-      selectionBackground: color('#3994BC33'),
-      cursor: color('#bfbfbf'),
-      cursorText: color('#191A1B'),
-      border: color('#2A2B2CFF'),
-      tabActiveBorder: color('#3994BC00'),
-    },
-  },
-  '2026 Light': {
-    displayName: '2026 Light',
-    extends: 'Light Modern',
-    colors: {
-      selectionBackground: color('#0069CC26'),
-      cursor: color('#202020'),
-      cursorText: color('#FFFFFF'),
+      background: {
+        dark: '#191A1B',
+      },
+      selectionBackground: pairedColor('#0069CC26', '#3994BC33'),
+      cursor: pairedColor('#202020', '#bfbfbf'),
+      cursorText: pairedColor('#FFFFFF', '#191A1B'),
+      border: {
+        dark: '#2A2B2CFF',
+      },
+      tabActiveBorder: {
+        dark: '#3994BC00',
+      },
     },
   },
 });

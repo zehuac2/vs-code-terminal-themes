@@ -2,17 +2,22 @@
 
 Recreate VS Code's built-in terminal themes in other terminals.
 
-- Supported themes
-  - [Dark (Visual Studio)](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_vs.json)
-  - [Light (Visual Studio)](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_vs.json)
-  - [Dark+](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_plus.json)
-  - [Light+](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_plus.json)
-  - [Dark Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json)
-  - [Light Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_modern.json)
-  - [Dark High Contrast](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/hc_black.json)
-  - [Light High Contrast](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/hc_light.json)
-  - [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
-  - [2026 Light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-light.json)
+- Supported theme families
+  - Visual Studio
+    ([dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_vs.json),
+    [light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_vs.json))
+  - Plus
+    ([dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_plus.json),
+    [light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_plus.json))
+  - Modern
+    ([dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json),
+    [light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_modern.json))
+  - High Contrast
+    ([dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/hc_black.json),
+    [light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/hc_light.json))
+  - 2026
+    ([dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json),
+    [light](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-light.json))
 - Supported terminals
   - iTerm2
   - Warp
@@ -31,8 +36,9 @@ with `extends`, matching the `include` chain from VS Code's theme JSON files.
   `cursorText`
 - `iterm2.colors` is reserved for iTerm2-only extras such as `bold`, `link`, and
   `underline`
-- each exported theme name matches VS Code's built-in theme name; shared
-  terminal defaults are kept private and are not generated as a separate profile
+- each exported theme combines the VS Code light and dark themes from the same
+  family; shared terminal defaults are kept private and are not generated as a
+  separate profile
 
 ## Methodology
 

@@ -193,61 +193,56 @@ describe('resolveTheme', () => {
     expect(() => resolveTheme(themes, 'broken')).toThrow('missing required color');
   });
 
-  it('exports built-in themes with names matching VS Code', () => {
+  it('exports built-in themes as light/dark families', () => {
     expect(Object.keys(builtInThemes)).toEqual([
-      'Dark (Visual Studio)',
-      'Light (Visual Studio)',
-      'Dark+',
-      'Light+',
-      'Dark Modern',
-      'Light Modern',
-      'Dark High Contrast',
-      'Light High Contrast',
-      '2026 Dark',
-      '2026 Light',
+      '2026',
+      'Visual Studio',
+      'Plus',
+      'Modern',
+      'High Contrast',
     ]);
   });
 
   it('resolves the built-in 2026 themes with requested overrides', () => {
-    const dark2026 = resolveTheme(builtInThemes, '2026 Dark');
-    const light2026 = resolveTheme(builtInThemes, '2026 Light');
+    const theme2026 = resolveTheme(builtInThemes, '2026');
 
-    expect(dark2026.colors.background.dark).toBe('#191A1B');
-    expect(dark2026.colors.selectionBackground?.dark).toBe('#3994BC33');
-    expect(dark2026.colors.cursor?.dark).toBe('#bfbfbf');
-    expect(dark2026.colors.cursorText?.dark).toBe('#191A1B');
-    expect(dark2026.colors.border?.dark).toBe('#2A2B2CFF');
-    expect(dark2026.colors.tabActiveBorder?.dark).toBe('#3994BC00');
+    expect(theme2026.colors.background.dark).toBe('#191A1B');
+    expect(theme2026.colors.selectionBackground?.dark).toBe('#3994BC33');
+    expect(theme2026.colors.cursor?.dark).toBe('#bfbfbf');
+    expect(theme2026.colors.cursorText?.dark).toBe('#191A1B');
+    expect(theme2026.colors.border?.dark).toBe('#2A2B2CFF');
+    expect(theme2026.colors.tabActiveBorder?.dark).toBe('#3994BC00');
 
-    expect(light2026.colors.background.light).toBe('#ffffff');
-    expect(light2026.colors.selectionBackground?.light).toBe('#0069CC26');
-    expect(light2026.colors.cursor?.light).toBe('#202020');
-    expect(light2026.colors.cursorText?.light).toBe('#FFFFFF');
-    expect(light2026.colors.foreground.light).toBe('#3B3B3B');
+    expect(theme2026.colors.background.light).toBe('#ffffff');
+    expect(theme2026.colors.selectionBackground?.light).toBe('#0069CC26');
+    expect(theme2026.colors.cursor?.light).toBe('#202020');
+    expect(theme2026.colors.cursorText?.light).toBe('#FFFFFF');
+    expect(theme2026.colors.foreground.light).toBe('#3B3B3B');
   });
 
   it('resolves the built-in VS Code inheritance chains', () => {
-    const darkClassic = resolveTheme(builtInThemes, 'Dark (Visual Studio)');
-    const darkPlus = resolveTheme(builtInThemes, 'Dark+');
-    const darkModern = resolveTheme(builtInThemes, 'Dark Modern');
-    const lightModern = resolveTheme(builtInThemes, 'Light Modern');
-    const darkHighContrast = resolveTheme(builtInThemes, 'Dark High Contrast');
-    const lightHighContrast = resolveTheme(builtInThemes, 'Light High Contrast');
+    const classic = resolveTheme(builtInThemes, 'Visual Studio');
+    const plus = resolveTheme(builtInThemes, 'Plus');
+    const modern = resolveTheme(builtInThemes, 'Modern');
+    const highContrast = resolveTheme(builtInThemes, 'High Contrast');
 
-    expect(darkClassic.colors.selectionBackground?.dark).toBe('#3A3D41');
-    expect(darkPlus.colors.selectionBackground?.dark).toBe('#3A3D41');
+    expect(classic.colors.selectionBackground?.dark).toBe('#3A3D41');
+    expect(classic.colors.selectionBackground?.light).toBe('#E5EBF1');
+    expect(plus.colors.selectionBackground?.dark).toBe('#3A3D41');
+    expect(plus.colors.selectionBackground?.light).toBe('#E5EBF1');
 
-    expect(darkModern.colors.foreground.dark).toBe('#CCCCCC');
-    expect(darkModern.colors.tabActiveBorder?.dark).toBe('#0078D4');
-    expect(darkModern.colors.ansiBlue.dark).toBe(darkClassic.colors.ansiBlue.dark);
+    expect(modern.colors.foreground.dark).toBe('#CCCCCC');
+    expect(modern.colors.foreground.light).toBe('#3B3B3B');
+    expect(modern.colors.tabActiveBorder?.dark).toBe('#0078D4');
+    expect(modern.colors.tabActiveBorder?.light).toBe('#005FB8');
+    expect(modern.colors.ansiBlue.dark).toBe(classic.colors.ansiBlue.dark);
 
-    expect(lightModern.colors.foreground.light).toBe('#3B3B3B');
-    expect(lightModern.colors.cursor?.light).toBe('#005FB8');
-    expect(lightModern.colors.selectionBackground?.light).toBe('#E5EBF1');
+    expect(modern.colors.cursor?.light).toBe('#005FB8');
+    expect(modern.colors.selectionBackground?.light).toBe('#E5EBF1');
 
-    expect(darkHighContrast.colors.background.dark).toBe('#000000');
-    expect(darkHighContrast.colors.ansiBlue.dark).toBe('#0000ee');
-    expect(lightHighContrast.colors.foreground.light).toBe('#292929');
-    expect(lightHighContrast.colors.cursor?.light).toBe('#0f4a85');
+    expect(highContrast.colors.background.dark).toBe('#000000');
+    expect(highContrast.colors.ansiBlue.dark).toBe('#0000ee');
+    expect(highContrast.colors.foreground.light).toBe('#292929');
+    expect(highContrast.colors.cursor?.light).toBe('#0f4a85');
   });
 });
