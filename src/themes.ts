@@ -1,207 +1,199 @@
-import { defineThemes } from './theme';
+import { defineThemes, type ColorOverride, type ThemeColorKey } from './theme';
+
+type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
+
+type ThemeColors = Partial<Record<ThemeColorKey, ColorOverride>>;
+
+const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> = {
+  light: {
+    ansiBlack: '#000000',
+    ansiRed: '#cd3131',
+    ansiGreen: '#107C10',
+    ansiYellow: '#949800',
+    ansiBlue: '#0451a5',
+    ansiMagenta: '#bc05bc',
+    ansiCyan: '#0598bc',
+    ansiWhite: '#555555',
+    ansiBrightBlack: '#666666',
+    ansiBrightRed: '#cd3131',
+    ansiBrightGreen: '#14CE14',
+    ansiBrightYellow: '#b5ba00',
+    ansiBrightBlue: '#0451a5',
+    ansiBrightMagenta: '#bc05bc',
+    ansiBrightCyan: '#0598bc',
+    ansiBrightWhite: '#a5a5a5',
+    background: '#ffffff',
+    foreground: '#333333',
+    selectionBackground: '#add6ff',
+    selectionForeground: '#000000',
+    cursor: '#000000',
+    cursorText: '#ffffff',
+    border: '#2A2B2CFF',
+    tabActiveBorder: '#005FB8',
+  },
+  dark: {
+    ansiBlack: '#000000',
+    ansiRed: '#cd3131',
+    ansiGreen: '#0DBC79',
+    ansiYellow: '#e5e510',
+    ansiBlue: '#2472c8',
+    ansiMagenta: '#bc3fbc',
+    ansiCyan: '#11a8cd',
+    ansiWhite: '#e5e5e5',
+    ansiBrightBlack: '#666666',
+    ansiBrightRed: '#f14c4c',
+    ansiBrightGreen: '#23d18b',
+    ansiBrightYellow: '#f5f543',
+    ansiBrightBlue: '#3b8eea',
+    ansiBrightMagenta: '#d670d6',
+    ansiBrightCyan: '#29b8db',
+    ansiBrightWhite: '#e5e5e5',
+    background: '#1f1f1f',
+    foreground: '#cccccc',
+    selectionBackground: '#264f78',
+    selectionForeground: '#ffffff',
+    cursor: '#aeafad',
+    cursorText: '#1f1f1f',
+    border: '#2A2B2CFF',
+    tabActiveBorder: '#0078D4',
+  },
+  hcDark: {
+    ansiBlack: '#000000',
+    ansiRed: '#cd0000',
+    ansiGreen: '#00cd00',
+    ansiYellow: '#cdcd00',
+    ansiBlue: '#0000ee',
+    ansiMagenta: '#cd00cd',
+    ansiCyan: '#00cdcd',
+    ansiWhite: '#e5e5e5',
+    ansiBrightBlack: '#7f7f7f',
+    ansiBrightRed: '#ff0000',
+    ansiBrightGreen: '#00ff00',
+    ansiBrightYellow: '#ffff00',
+    ansiBrightBlue: '#5c5cff',
+    ansiBrightMagenta: '#ff00ff',
+    ansiBrightCyan: '#00ffff',
+    ansiBrightWhite: '#ffffff',
+    background: '#000000',
+    foreground: '#ffffff',
+    selectionBackground: '#f38518',
+    selectionForeground: '#000000',
+    cursor: '#ffffff',
+    cursorText: '#000000',
+    border: '#2A2B2CFF',
+    tabActiveBorder: '#0078D4',
+  },
+  hcLight: {
+    ansiBlack: '#292929',
+    ansiRed: '#cd3131',
+    ansiGreen: '#136C13',
+    ansiYellow: '#949800',
+    ansiBlue: '#0451a5',
+    ansiMagenta: '#bc05bc',
+    ansiCyan: '#0598bc',
+    ansiWhite: '#555555',
+    ansiBrightBlack: '#666666',
+    ansiBrightRed: '#cd3131',
+    ansiBrightGreen: '#00bc00',
+    ansiBrightYellow: '#b5ba00',
+    ansiBrightBlue: '#0451a5',
+    ansiBrightMagenta: '#bc05bc',
+    ansiBrightCyan: '#0598bc',
+    ansiBrightWhite: '#a5a5a5',
+    background: '#ffffff',
+    foreground: '#292929',
+    selectionBackground: '#0f4a85',
+    selectionForeground: '#ffffff',
+    cursor: '#0f4a85',
+    cursorText: '#ffffff',
+    border: '#2A2B2CFF',
+    tabActiveBorder: '#005FB8',
+  },
+};
+
+function color(value: string): ColorOverride {
+  return {
+    light: value,
+    dark: value,
+    hcDark: value,
+    hcLight: value,
+  };
+}
+
+function defaultColors(kind: ThemeKind): ThemeColors {
+  return Object.fromEntries(
+    Object.entries(DEFAULT_COLORS_BY_KIND[kind]).map(([key, value]) => [key, color(value)]),
+  ) as ThemeColors;
+}
 
 export const themes = defineThemes({
-  base: {
-    displayName: 'Base',
+  'Dark (Visual Studio)': {
+    displayName: 'Dark (Visual Studio)',
     colors: {
-      ansiBlack: {
-        light: '#000000',
-        dark: '#000000',
-        hcDark: '#000000',
-        hcLight: '#292929',
-      },
-      ansiRed: {
-        light: '#cd3131',
-        dark: '#cd3131',
-        hcDark: '#cd0000',
-        hcLight: '#cd3131',
-      },
-      ansiGreen: {
-        light: '#107C10',
-        dark: '#0DBC79',
-        hcDark: '#00cd00',
-        hcLight: '#136C13',
-      },
-      ansiYellow: {
-        light: '#949800',
-        dark: '#e5e510',
-        hcDark: '#cdcd00',
-        hcLight: '#949800',
-      },
-      ansiBlue: {
-        light: '#0451a5',
-        dark: '#2472c8',
-        hcDark: '#0000ee',
-        hcLight: '#0451a5',
-      },
-      ansiMagenta: {
-        light: '#bc05bc',
-        dark: '#bc3fbc',
-        hcDark: '#cd00cd',
-        hcLight: '#bc05bc',
-      },
-      ansiCyan: {
-        light: '#0598bc',
-        dark: '#11a8cd',
-        hcDark: '#00cdcd',
-        hcLight: '#0598bc',
-      },
-      ansiWhite: {
-        light: '#555555',
-        dark: '#e5e5e5',
-        hcDark: '#e5e5e5',
-        hcLight: '#555555',
-      },
-      ansiBrightBlack: {
-        light: '#666666',
-        dark: '#666666',
-        hcDark: '#7f7f7f',
-        hcLight: '#666666',
-      },
-      ansiBrightRed: {
-        light: '#cd3131',
-        dark: '#f14c4c',
-        hcDark: '#ff0000',
-        hcLight: '#cd3131',
-      },
-      ansiBrightGreen: {
-        light: '#14CE14',
-        dark: '#23d18b',
-        hcDark: '#00ff00',
-        hcLight: '#00bc00',
-      },
-      ansiBrightYellow: {
-        light: '#b5ba00',
-        dark: '#f5f543',
-        hcDark: '#ffff00',
-        hcLight: '#b5ba00',
-      },
-      ansiBrightBlue: {
-        light: '#0451a5',
-        dark: '#3b8eea',
-        hcDark: '#5c5cff',
-        hcLight: '#0451a5',
-      },
-      ansiBrightMagenta: {
-        light: '#bc05bc',
-        dark: '#d670d6',
-        hcDark: '#ff00ff',
-        hcLight: '#bc05bc',
-      },
-      ansiBrightCyan: {
-        light: '#0598bc',
-        dark: '#29b8db',
-        hcDark: '#00ffff',
-        hcLight: '#0598bc',
-      },
-      ansiBrightWhite: {
-        light: '#a5a5a5',
-        dark: '#e5e5e5',
-        hcDark: '#ffffff',
-        hcLight: '#a5a5a5',
-      },
-      background: {
-        light: '#ffffff',
-        dark: '#1f1f1f',
-        hcDark: '#000000',
-        hcLight: '#ffffff',
-      },
-      foreground: {
-        light: '#333333',
-        dark: '#cccccc',
-        hcDark: '#ffffff',
-        hcLight: '#292929',
-      },
-      selectionBackground: {
-        light: '#add6ff',
-        dark: '#264f78',
-        hcDark: '#f38518',
-        hcLight: '#0f4a85',
-      },
-      selectionForeground: {
-        light: '#000000',
-        dark: '#ffffff',
-        hcDark: '#000000',
-        hcLight: '#ffffff',
-      },
-      cursor: {
-        light: '#000000',
-        dark: '#aeafad',
-        hcDark: '#ffffff',
-        hcLight: '#0f4a85',
-      },
-      cursorText: {
-        light: '#ffffff',
-        dark: '#1f1f1f',
-        hcDark: '#000000',
-        hcLight: '#ffffff',
-      },
+      ...defaultColors('dark'),
+      selectionBackground: color('#3A3D41'),
     },
   },
-  vsCodeClassic: {
-    displayName: 'VS Code Classic',
-    extends: 'base',
+  'Light (Visual Studio)': {
+    displayName: 'Light (Visual Studio)',
     colors: {
-      selectionBackground: {
-        light: '#E5EBF1',
-        dark: '#3A3D41',
-      },
+      ...defaultColors('light'),
+      selectionBackground: color('#E5EBF1'),
     },
   },
-  vsCodePlus: {
-    displayName: 'VS Code Plus',
-    extends: 'vsCodeClassic',
+  'Dark+': {
+    displayName: 'Dark+',
+    extends: 'Dark (Visual Studio)',
   },
-  vsCodeModern: {
-    displayName: 'VS Code Modern',
-    extends: 'vsCodePlus',
+  'Light+': {
+    displayName: 'Light+',
+    extends: 'Light (Visual Studio)',
+  },
+  'Dark Modern': {
+    displayName: 'Dark Modern',
+    extends: 'Dark+',
     colors: {
-      foreground: {
-        light: '#3B3B3B',
-        dark: '#CCCCCC',
-      },
-      cursor: {
-        light: '#005FB8',
-      },
-      selectionBackground: {
-        light: '#E5EBF1',
-      },
-      tabActiveBorder: {
-        light: '#005FB8',
-        dark: '#0078D4',
-        hcDark: '#0078D4',
-        hcLight: '#005FB8',
-      },
+      foreground: color('#CCCCCC'),
+      tabActiveBorder: color('#0078D4'),
     },
   },
-  vsCode: {
-    displayName: 'VS Code',
-    extends: 'vsCodeModern',
+  'Light Modern': {
+    displayName: 'Light Modern',
+    extends: 'Light+',
     colors: {
-      background: {
-        dark: '#191A1B',
-      },
-      selectionBackground: {
-        light: '#0069CC26',
-        dark: '#3994BC33',
-      },
-      cursor: {
-        light: '#202020',
-        dark: '#bfbfbf',
-      },
-      cursorText: {
-        light: '#FFFFFF',
-        dark: '#191A1B',
-      },
-      border: {
-        light: '#2A2B2CFF',
-        dark: '#2A2B2CFF',
-        hcDark: '#2A2B2CFF',
-        hcLight: '#2A2B2CFF',
-      },
-      tabActiveBorder: {
-        dark: '#3994BC00',
-      },
+      foreground: color('#3B3B3B'),
+      cursor: color('#005FB8'),
+      selectionBackground: color('#E5EBF1'),
+      tabActiveBorder: color('#005FB8'),
+    },
+  },
+  'Dark High Contrast': {
+    displayName: 'Dark High Contrast',
+    colors: defaultColors('hcDark'),
+  },
+  'Light High Contrast': {
+    displayName: 'Light High Contrast',
+    colors: defaultColors('hcLight'),
+  },
+  '2026 Dark': {
+    displayName: '2026 Dark',
+    extends: 'Dark Modern',
+    colors: {
+      background: color('#191A1B'),
+      selectionBackground: color('#3994BC33'),
+      cursor: color('#bfbfbf'),
+      cursorText: color('#191A1B'),
+      border: color('#2A2B2CFF'),
+      tabActiveBorder: color('#3994BC00'),
+    },
+  },
+  '2026 Light': {
+    displayName: '2026 Light',
+    extends: 'Light Modern',
+    colors: {
+      selectionBackground: color('#0069CC26'),
+      cursor: color('#202020'),
+      cursorText: color('#FFFFFF'),
     },
   },
 });
