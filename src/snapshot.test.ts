@@ -17,7 +17,7 @@ describe('Warp preset snapshots', () => {
     for (const variant of WARP_COLOR_VARIANTS) {
       it(`${themeName} ${variant}`, () => {
         const variantDisplayName = variant === 'light' ? 'Light' : 'Dark';
-        const displayName = `${definition.displayName ?? themeName} ${variantDisplayName}`;
+        const displayName = `VSCode ${definition.displayName ?? themeName} ${variantDisplayName}`;
 
         expect(
           exportForWarp(resolveTheme(themes, themeName), { name: displayName, variant }, 'object'),

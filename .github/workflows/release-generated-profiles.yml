@@ -31,10 +31,16 @@ jobs:
       - name: Generate profiles
         run: bun run build
 
-      - name: Upload profiles to release
+      - name: Zip generated profile folders
+        run: |
+          cd generated
+          zip -r iTerm.zip iTerm
+          zip -r Warp.zip Warp
+
+      - name: Upload zipped profiles to release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            generated/*.itermcolors
-            generated/*.yaml
+            generated/iTerm.zip
+            generated/Warp.zip
           fail_on_unmatched_files: true
