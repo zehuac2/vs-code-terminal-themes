@@ -1,7 +1,7 @@
 import { resolveTheme } from '@/theme';
-import { exportForIterm2 } from '@/iterm2';
+import { exportForIterm2 } from '@/generators/iterm2';
 import { themes } from '@/themes';
-import { exportForWarp, WARP_COLOR_VARIANTS } from '@/warp';
+import { exportForWarp, WARP_COLOR_VARIANTS } from '@/generators/warp';
 import { $ } from 'bun';
 
 const GENERATED_DIR = 'generated';

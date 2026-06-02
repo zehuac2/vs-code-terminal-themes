@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from '@plist/plist';
-import { exportForIterm2 } from '@/iterm2';
+import { exportForIterm2 } from '@/generators/iterm2';
 import { defineThemes, resolveTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
 

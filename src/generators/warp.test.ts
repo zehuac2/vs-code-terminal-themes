@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from 'yaml';
-import { exportForWarp, type WarpExportObject } from '@/warp';
+import { exportForWarp, type WarpExportObject } from '@/generators/warp';
 import { defineThemes, resolveTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
 
