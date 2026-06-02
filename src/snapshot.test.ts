@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { exportForIterm2 } from './iterm2';
-import { resolveTheme } from './theme';
-import { themes } from './themes';
-import { exportForWarp, WARP_COLOR_VARIANTS } from './warp';
+import { exportForIterm2 } from '@/generators/iterm2';
+import { resolveTheme } from '@/theme';
+import { themes } from '@/themes';
+import { exportForWarp, WARP_COLOR_VARIANTS } from '@/generators/warp';
 
 describe('iTerm2 preset snapshots', () => {
   Object.keys(themes).map((themeName) => {
