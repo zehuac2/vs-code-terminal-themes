@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from 'yaml';
-import { exportForWarp, type WarpExportObject } from './warp';
-import { defineThemes, resolveTheme } from './theme';
-import { themes as builtInThemes } from './themes';
+import { exportForWarp, type WarpExportObject } from '@/warp';
+import { defineThemes, resolveTheme } from '@/theme';
+import { themes as builtInThemes } from '@/themes';
 
 describe('exportForWarp', () => {
   it('exports core colors and normal and bright ANSI colors', () => {

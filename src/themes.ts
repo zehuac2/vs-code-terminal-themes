@@ -1,4 +1,4 @@
-import { defineThemes, type ColorOverride, type ThemeColorKey } from './theme';
+import { defineThemes, type ColorOverride, type ThemeColorKey } from '@/theme';
 
 type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
 

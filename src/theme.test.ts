@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { defineThemes, resolveTheme } from './theme';
-import { themes as builtInThemes } from './themes';
+import { defineThemes, resolveTheme } from '@/theme';
+import { themes as builtInThemes } from '@/themes';
 
 const COMPLETE_TEST_COLORS = {
   ansiBlack: {

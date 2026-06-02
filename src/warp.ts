@@ -1,11 +1,11 @@
 import { stringify } from 'yaml';
-import { isTransparentColor, toOpaqueBackgroundHex, toOpaqueHex } from './color';
+import { isTransparentColor, toOpaqueBackgroundHex, toOpaqueHex } from '@/color';
 import {
   type AnsiThemeColorKey,
   type ColorVariant,
   type ColorValue,
   type ResolvedTheme,
-} from './theme';
+} from '@/theme';
 
 export const WARP_COLOR_VARIANTS = ['light', 'dark'] as const satisfies readonly ColorVariant[];
 export type WarpColorVariant = typeof WARP_COLOR_VARIANTS[number];
