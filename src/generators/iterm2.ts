@@ -1,13 +1,13 @@
 import { type Dictionary, PlistFormat } from '@plist/common';
 import { serialize } from '@plist/plist';
-import { compositeColor } from './color';
+import { compositeColor } from '@/color';
 import {
   ANSI_THEME_COLOR_KEYS,
   ANSI_THEME_COLOR_TO_INDEX,
   ITERM2_EXTRA_COLOR_KEYS,
   type ColorValue,
   type ResolvedTheme,
-} from './theme';
+} from '@/theme';
 
 interface ITerm2Color extends Dictionary {
   'Alpha Component': number;
