@@ -1,3 +1,3 @@
-# CLAUDE.md
+@AGENTS.md
 
-Read AGENTS.md for general guidelines.
+# CLAUDE.md
