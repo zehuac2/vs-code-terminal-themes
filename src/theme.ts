@@ -51,6 +51,13 @@ export const REQUIRED_THEME_COLOR_KEYS = [...ANSI_THEME_COLOR_KEYS, 'background'
 export type RequiredThemeColorKey = typeof REQUIRED_THEME_COLOR_KEYS[number];
 export type OptionalThemeColorKey = Exclude<ThemeColorKey, RequiredThemeColorKey>;
 
+const REQUIRED_THEME_COLOR_KEY_SET = new Set<ThemeColorKey>(REQUIRED_THEME_COLOR_KEYS);
+
+/** Type guard: `true` when `key` must be fully defined on every resolved theme. */
+function isRequiredThemeColorKey(key: ThemeColorKey): key is RequiredThemeColorKey {
+  return REQUIRED_THEME_COLOR_KEY_SET.has(key);
+}
+
 export const ITERM2_EXTRA_COLOR_KEYS = ['bold', 'link', 'underline'] as const;
 export type Iterm2ExtraColorKey = typeof ITERM2_EXTRA_COLOR_KEYS[number];
 
@@ -70,44 +77,78 @@ export interface ResolvedTheme {
   };
 }
 
+/**
+ * Identity helper that preserves the literal types of a theme map while
+ * constraining it to {@link ThemeDefinition}. Use it when declaring themes so
+ * theme names and color keys stay strongly typed for {@link resolveTheme}.
+ */
 export function defineThemes<const T extends Record<string, ThemeDefinition>>(themes: T): T {
   return themes;
 }
 
+/**
+ * Layers an `override` on top of an inherited `parent` color, variant by
+ * variant, with the override winning where it specifies a value.
+ *
+ * @returns A partial color holding only the variants that are defined, or
+ *   `undefined` when neither side contributes anything. The result may still
+ *   be missing variants — completeness is checked later by
+ *   {@link validateColorValue}.
+ */
 function mergeColorValue(
   parent: ColorValue | undefined,
   override: ColorOverride | undefined,
-): ColorValue | undefined {
+): Partial<ColorValue> | undefined {
   if (!parent && !override) {
     return undefined;
   }
 
-  return {
-    light: override?.light ?? parent?.light ?? '',
-    dark: override?.dark ?? parent?.dark ?? '',
-    hcDark: override?.hcDark ?? parent?.hcDark ?? '',
-    hcLight: override?.hcLight ?? parent?.hcLight ?? '',
-  };
+  return Object.fromEntries(
+    COLOR_VARIANTS
+      .map((variant) => [variant, override?.[variant] ?? parent?.[variant]] as const)
+      .filter(([, value]) => value !== undefined),
+  );
 }
 
-function assertResolvedColorValue(
+/**
+ * Asserts that a merged color is complete and returns it as a full
+ * {@link ColorValue}.
+ *
+ * @param themeName - Theme being resolved, used in error messages.
+ * @param colorPath - Dotted path of the color (e.g. `colors.ansiBlue`), used in
+ *   error messages.
+ * @param merged - The merged-but-possibly-incomplete color, or `undefined` when
+ *   the color is absent entirely.
+ * @param isRequired - Whether the color must be present.
+ * @returns The complete color, or `undefined` when an optional color is absent.
+ * @throws If a required color is absent, or if any variant is missing.
+ */
+function validateColorValue(
   themeName: string,
   colorPath: string,
-  colorValue: ColorValue | undefined,
-): ColorValue {
-  if (!colorValue) {
-    throw new Error(`Theme "${themeName}" is missing "${colorPath}" after resolution.`);
-  }
-
-  for (const variant of COLOR_VARIANTS) {
-    if (!colorValue[variant]) {
-      throw new Error(`Theme "${themeName}" is missing "${colorPath}.${variant}" after resolution.`);
+  merged: Partial<ColorValue> | undefined,
+  isRequired: boolean,
+): ColorValue | undefined {
+  if (!merged) {
+    if (isRequired) {
+      throw new Error(`Theme "${themeName}" is missing required color "${colorPath}".`);
     }
+
+    return undefined;
   }
 
-  return colorValue;
+  const missingVariant = COLOR_VARIANTS.find((variant) => !merged[variant]);
+
+  if (missingVariant) {
+    throw new Error(
+      `Theme "${themeName}" is missing "${colorPath}.${missingVariant}" after resolution.`,
+    );
+  }
+
+  return merged as ColorValue;
 }
 
+/** Maps over `values`, keeping only the results that are not `undefined`. */
 function mapDefined<const T, U>(
   values: readonly T[],
   mapValue: (value: T) => U | undefined,
@@ -118,61 +159,51 @@ function mapDefined<const T, U>(
   });
 }
 
-function resolveRequiredOrOptionalColor(
+/**
+ * Resolves a group of colors (the theme palette or the iTerm2 extras) into
+ * `[key, value]` entries by merging each key's override onto the parent and
+ * validating the result. Keys whose optional colors are absent are dropped.
+ *
+ * @param themeName - Theme being resolved, used in error messages.
+ * @param pathPrefix - Path prefix for the group (e.g. `colors`,
+ *   `iterm2.colors`), used in error messages.
+ * @param keys - The color keys to resolve.
+ * @param parentColors - Already-resolved colors inherited from the parent theme.
+ * @param overrideColors - This theme's own color overrides, if any.
+ * @param isRequired - Predicate deciding whether a missing key is an error.
+ */
+function resolveColorEntries<K extends string>(
   themeName: string,
-  colorPath: string,
-  colorValue: ColorValue | undefined,
-  isRequired: boolean,
-): ColorValue | undefined {
-  if (!colorValue) {
-    if (isRequired) {
-      throw new Error(`Theme "${themeName}" is missing required color "${colorPath}".`);
-    }
-
-    return undefined;
-  }
-
-  return assertResolvedColorValue(themeName, colorPath, colorValue);
-}
-
-function resolveThemeColorEntries(
-  themeName: string,
-  parent: ResolvedTheme | undefined,
-  definition: ThemeDefinition,
-): Array<[ThemeColorKey, ColorValue]> {
-  return mapDefined(THEME_COLOR_KEYS, (colorKey) => {
-    const mergedColorValue = mergeColorValue(parent?.colors[colorKey], definition.colors?.[colorKey]);
-    const resolvedColorValue = resolveRequiredOrOptionalColor(
+  pathPrefix: string,
+  keys: readonly K[],
+  parentColors: Partial<Record<K, ColorValue>>,
+  overrideColors: Partial<Record<K, ColorOverride>> | undefined,
+  isRequired: (key: K) => boolean,
+): Array<[K, ColorValue]> {
+  return mapDefined(keys, (colorKey) => {
+    const merged = mergeColorValue(parentColors[colorKey], overrideColors?.[colorKey]);
+    const resolved = validateColorValue(
       themeName,
-      `colors.${colorKey}`,
-      mergedColorValue,
-      REQUIRED_THEME_COLOR_KEYS.includes(colorKey as RequiredThemeColorKey),
+      `${pathPrefix}.${colorKey}`,
+      merged,
+      isRequired(colorKey),
     );
 
-    return resolvedColorValue ? [colorKey, resolvedColorValue] : undefined;
+    return resolved ? [colorKey, resolved] : undefined;
   });
 }
 
-function resolveIterm2ColorEntries(
-  themeName: string,
-  parent: ResolvedTheme | undefined,
-  definition: ThemeDefinition,
-): Array<[Iterm2ExtraColorKey, ColorValue]> {
-  return mapDefined(ITERM2_EXTRA_COLOR_KEYS, (colorKey) => {
-    const mergedColorValue = mergeColorValue(
-      parent?.iterm2.colors[colorKey],
-      definition.iterm2?.colors?.[colorKey],
-    );
-
-    return mergedColorValue
-      ? [
-          colorKey,
-          assertResolvedColorValue(themeName, `iterm2.colors.${colorKey}`, mergedColorValue),
-        ]
-      : undefined;
-  });
-}
-
+/**
+ * Resolves a named theme into a fully-populated {@link ResolvedTheme} by
+ * recursively resolving its `extends` parent and layering this theme's overrides
+ * on top. Results are memoized within the call, and inheritance cycles are
+ * detected.
+ *
+ * @param themes - The map of all available theme definitions.
+ * @param themeName - The theme to resolve.
+ * @throws If the theme (or a referenced parent) is not defined, an inheritance
+ *   cycle exists, or a required color is missing after resolution.
+ */
 export function resolveTheme(
   themes: Record<string, ThemeDefinition>,
   themeName: string,
@@ -202,10 +233,26 @@ export function resolveTheme(
     const parent = definition.extends ? resolveByName(definition.extends) : undefined;
     const resolvedTheme: ResolvedTheme = {
       colors: Object.fromEntries(
-        resolveThemeColorEntries(currentThemeName, parent, definition),
+        resolveColorEntries(
+          currentThemeName,
+          'colors',
+          THEME_COLOR_KEYS,
+          parent?.colors ?? {},
+          definition.colors,
+          isRequiredThemeColorKey,
+        ),
       ) as ResolvedTheme['colors'],
       iterm2: {
-        colors: Object.fromEntries(resolveIterm2ColorEntries(currentThemeName, parent, definition)),
+        colors: Object.fromEntries(
+          resolveColorEntries(
+            currentThemeName,
+            'iterm2.colors',
+            ITERM2_EXTRA_COLOR_KEYS,
+            parent?.iterm2.colors ?? {},
+            definition.iterm2?.colors,
+            () => false,
+          ),
+        ),
       },
     };
 
