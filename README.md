@@ -21,6 +21,7 @@ Recreate VS Code's built-in terminal themes in other terminals.
 - Supported terminals
   - iTerm2
   - Warp
+  - Ghostty
 
 Download color profiles in
 [releases](https://github.com/zehuac2/vs-code-terminal-themes/releases). Run
@@ -55,3 +56,7 @@ iTerm2's color theme schema can be found at
 
 Warp's custom theme schema can be found in
 [Custom Themes](https://docs.warp.dev/appearance/custom-themes).
+
+Ghostty's theme configuration options can be found at
+[Features: Theme](https://ghostty.org/docs/features/theme). Ghostty theme files
+are extensionless and belong in `~/.config/ghostty/themes/`.
