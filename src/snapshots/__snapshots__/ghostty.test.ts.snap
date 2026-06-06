@@ -1,0 +1,291 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Ghostty preset snapshots 2026 light 1`] = `
+{
+  "background": "#FFFFFF",
+  "cursorColor": "#202020",
+  "cursorText": "#FFFFFF",
+  "foreground": "#3B3B3B",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#107C10",
+    "#949800",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#555555",
+    "#666666",
+    "#CD3131",
+    "#14CE14",
+    "#B5BA00",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#A5A5A5",
+  ],
+  "selectionBackground": "#D9E9F7",
+  "selectionForeground": "#000000",
+}
+`;
+
+exports[`Ghostty preset snapshots 2026 dark 1`] = `
+{
+  "background": "#191A1B",
+  "cursorColor": "#BFBFBF",
+  "cursorText": "#191A1B",
+  "foreground": "#CCCCCC",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#0DBC79",
+    "#E5E510",
+    "#2472C8",
+    "#BC3FBC",
+    "#11A8CD",
+    "#E5E5E5",
+    "#666666",
+    "#F14C4C",
+    "#23D18B",
+    "#F5F543",
+    "#3B8EEA",
+    "#D670D6",
+    "#29B8DB",
+    "#E5E5E5",
+  ],
+  "selectionBackground": "#1F323B",
+  "selectionForeground": "#FFFFFF",
+}
+`;
+
+exports[`Ghostty preset snapshots Visual Studio light 1`] = `
+{
+  "background": "#FFFFFF",
+  "cursorColor": "#000000",
+  "cursorText": "#FFFFFF",
+  "foreground": "#333333",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#107C10",
+    "#949800",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#555555",
+    "#666666",
+    "#CD3131",
+    "#14CE14",
+    "#B5BA00",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#A5A5A5",
+  ],
+  "selectionBackground": "#E5EBF1",
+  "selectionForeground": "#000000",
+}
+`;
+
+exports[`Ghostty preset snapshots Visual Studio dark 1`] = `
+{
+  "background": "#1F1F1F",
+  "cursorColor": "#AEAFAD",
+  "cursorText": "#1F1F1F",
+  "foreground": "#CCCCCC",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#0DBC79",
+    "#E5E510",
+    "#2472C8",
+    "#BC3FBC",
+    "#11A8CD",
+    "#E5E5E5",
+    "#666666",
+    "#F14C4C",
+    "#23D18B",
+    "#F5F543",
+    "#3B8EEA",
+    "#D670D6",
+    "#29B8DB",
+    "#E5E5E5",
+  ],
+  "selectionBackground": "#3A3D41",
+  "selectionForeground": "#FFFFFF",
+}
+`;
+
+exports[`Ghostty preset snapshots Plus light 1`] = `
+{
+  "background": "#FFFFFF",
+  "cursorColor": "#000000",
+  "cursorText": "#FFFFFF",
+  "foreground": "#333333",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#107C10",
+    "#949800",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#555555",
+    "#666666",
+    "#CD3131",
+    "#14CE14",
+    "#B5BA00",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#A5A5A5",
+  ],
+  "selectionBackground": "#E5EBF1",
+  "selectionForeground": "#000000",
+}
+`;
+
+exports[`Ghostty preset snapshots Plus dark 1`] = `
+{
+  "background": "#1F1F1F",
+  "cursorColor": "#AEAFAD",
+  "cursorText": "#1F1F1F",
+  "foreground": "#CCCCCC",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#0DBC79",
+    "#E5E510",
+    "#2472C8",
+    "#BC3FBC",
+    "#11A8CD",
+    "#E5E5E5",
+    "#666666",
+    "#F14C4C",
+    "#23D18B",
+    "#F5F543",
+    "#3B8EEA",
+    "#D670D6",
+    "#29B8DB",
+    "#E5E5E5",
+  ],
+  "selectionBackground": "#3A3D41",
+  "selectionForeground": "#FFFFFF",
+}
+`;
+
+exports[`Ghostty preset snapshots Modern light 1`] = `
+{
+  "background": "#FFFFFF",
+  "cursorColor": "#005FB8",
+  "cursorText": "#FFFFFF",
+  "foreground": "#3B3B3B",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#107C10",
+    "#949800",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#555555",
+    "#666666",
+    "#CD3131",
+    "#14CE14",
+    "#B5BA00",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#A5A5A5",
+  ],
+  "selectionBackground": "#E5EBF1",
+  "selectionForeground": "#000000",
+}
+`;
+
+exports[`Ghostty preset snapshots Modern dark 1`] = `
+{
+  "background": "#1F1F1F",
+  "cursorColor": "#AEAFAD",
+  "cursorText": "#1F1F1F",
+  "foreground": "#CCCCCC",
+  "palette": [
+    "#000000",
+    "#CD3131",
+    "#0DBC79",
+    "#E5E510",
+    "#2472C8",
+    "#BC3FBC",
+    "#11A8CD",
+    "#E5E5E5",
+    "#666666",
+    "#F14C4C",
+    "#23D18B",
+    "#F5F543",
+    "#3B8EEA",
+    "#D670D6",
+    "#29B8DB",
+    "#E5E5E5",
+  ],
+  "selectionBackground": "#3A3D41",
+  "selectionForeground": "#FFFFFF",
+}
+`;
+
+exports[`Ghostty preset snapshots High Contrast light 1`] = `
+{
+  "background": "#FFFFFF",
+  "cursorColor": "#0F4A85",
+  "cursorText": "#FFFFFF",
+  "foreground": "#292929",
+  "palette": [
+    "#292929",
+    "#CD3131",
+    "#136C13",
+    "#949800",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#555555",
+    "#666666",
+    "#CD3131",
+    "#00BC00",
+    "#B5BA00",
+    "#0451A5",
+    "#BC05BC",
+    "#0598BC",
+    "#A5A5A5",
+  ],
+  "selectionBackground": "#0F4A85",
+  "selectionForeground": "#FFFFFF",
+}
+`;
+
+exports[`Ghostty preset snapshots High Contrast dark 1`] = `
+{
+  "background": "#000000",
+  "cursorColor": "#FFFFFF",
+  "cursorText": "#000000",
+  "foreground": "#FFFFFF",
+  "palette": [
+    "#000000",
+    "#CD0000",
+    "#00CD00",
+    "#CDCD00",
+    "#0000EE",
+    "#CD00CD",
+    "#00CDCD",
+    "#E5E5E5",
+    "#7F7F7F",
+    "#FF0000",
+    "#00FF00",
+    "#FFFF00",
+    "#5C5CFF",
+    "#FF00FF",
+    "#00FFFF",
+    "#FFFFFF",
+  ],
+  "selectionBackground": "#F38518",
+  "selectionForeground": "#000000",
+}
+`;

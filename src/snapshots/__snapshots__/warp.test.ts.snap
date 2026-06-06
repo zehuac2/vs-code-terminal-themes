@@ -1,0 +1,331 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Warp preset snapshots 2026 light 1`] = `
+{
+  "accent": "#005FB8",
+  "background": "#FFFFFF",
+  "cursor": "#202020",
+  "details": "lighter",
+  "foreground": "#3B3B3B",
+  "name": "VSCode 2026 Light",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#14CE14",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#A5A5A5",
+      "yellow": "#B5BA00",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#107C10",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#555555",
+      "yellow": "#949800",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots 2026 dark 1`] = `
+{
+  "accent": "#2472C8",
+  "background": "#191A1B",
+  "cursor": "#BFBFBF",
+  "details": "darker",
+  "foreground": "#CCCCCC",
+  "name": "VSCode 2026 Dark",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#3B8EEA",
+      "cyan": "#29B8DB",
+      "green": "#23D18B",
+      "magenta": "#D670D6",
+      "red": "#F14C4C",
+      "white": "#E5E5E5",
+      "yellow": "#F5F543",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#2472C8",
+      "cyan": "#11A8CD",
+      "green": "#0DBC79",
+      "magenta": "#BC3FBC",
+      "red": "#CD3131",
+      "white": "#E5E5E5",
+      "yellow": "#E5E510",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots Visual Studio light 1`] = `
+{
+  "accent": "#005FB8",
+  "background": "#FFFFFF",
+  "cursor": "#000000",
+  "details": "lighter",
+  "foreground": "#333333",
+  "name": "VSCode Visual Studio Light",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#14CE14",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#A5A5A5",
+      "yellow": "#B5BA00",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#107C10",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#555555",
+      "yellow": "#949800",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots Visual Studio dark 1`] = `
+{
+  "accent": "#0078D4",
+  "background": "#1F1F1F",
+  "cursor": "#AEAFAD",
+  "details": "darker",
+  "foreground": "#CCCCCC",
+  "name": "VSCode Visual Studio Dark",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#3B8EEA",
+      "cyan": "#29B8DB",
+      "green": "#23D18B",
+      "magenta": "#D670D6",
+      "red": "#F14C4C",
+      "white": "#E5E5E5",
+      "yellow": "#F5F543",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#2472C8",
+      "cyan": "#11A8CD",
+      "green": "#0DBC79",
+      "magenta": "#BC3FBC",
+      "red": "#CD3131",
+      "white": "#E5E5E5",
+      "yellow": "#E5E510",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots Plus light 1`] = `
+{
+  "accent": "#005FB8",
+  "background": "#FFFFFF",
+  "cursor": "#000000",
+  "details": "lighter",
+  "foreground": "#333333",
+  "name": "VSCode Plus Light",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#14CE14",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#A5A5A5",
+      "yellow": "#B5BA00",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#107C10",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#555555",
+      "yellow": "#949800",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots Plus dark 1`] = `
+{
+  "accent": "#0078D4",
+  "background": "#1F1F1F",
+  "cursor": "#AEAFAD",
+  "details": "darker",
+  "foreground": "#CCCCCC",
+  "name": "VSCode Plus Dark",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#3B8EEA",
+      "cyan": "#29B8DB",
+      "green": "#23D18B",
+      "magenta": "#D670D6",
+      "red": "#F14C4C",
+      "white": "#E5E5E5",
+      "yellow": "#F5F543",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#2472C8",
+      "cyan": "#11A8CD",
+      "green": "#0DBC79",
+      "magenta": "#BC3FBC",
+      "red": "#CD3131",
+      "white": "#E5E5E5",
+      "yellow": "#E5E510",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots Modern light 1`] = `
+{
+  "accent": "#005FB8",
+  "background": "#FFFFFF",
+  "cursor": "#005FB8",
+  "details": "lighter",
+  "foreground": "#3B3B3B",
+  "name": "VSCode Modern Light",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#14CE14",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#A5A5A5",
+      "yellow": "#B5BA00",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#107C10",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#555555",
+      "yellow": "#949800",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots Modern dark 1`] = `
+{
+  "accent": "#0078D4",
+  "background": "#1F1F1F",
+  "cursor": "#AEAFAD",
+  "details": "darker",
+  "foreground": "#CCCCCC",
+  "name": "VSCode Modern Dark",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#3B8EEA",
+      "cyan": "#29B8DB",
+      "green": "#23D18B",
+      "magenta": "#D670D6",
+      "red": "#F14C4C",
+      "white": "#E5E5E5",
+      "yellow": "#F5F543",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#2472C8",
+      "cyan": "#11A8CD",
+      "green": "#0DBC79",
+      "magenta": "#BC3FBC",
+      "red": "#CD3131",
+      "white": "#E5E5E5",
+      "yellow": "#E5E510",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots High Contrast light 1`] = `
+{
+  "accent": "#005FB8",
+  "background": "#FFFFFF",
+  "cursor": "#0F4A85",
+  "details": "lighter",
+  "foreground": "#292929",
+  "name": "VSCode High Contrast Light",
+  "terminal_colors": {
+    "bright": {
+      "black": "#666666",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#00BC00",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#A5A5A5",
+      "yellow": "#B5BA00",
+    },
+    "normal": {
+      "black": "#292929",
+      "blue": "#0451A5",
+      "cyan": "#0598BC",
+      "green": "#136C13",
+      "magenta": "#BC05BC",
+      "red": "#CD3131",
+      "white": "#555555",
+      "yellow": "#949800",
+    },
+  },
+}
+`;
+
+exports[`Warp preset snapshots High Contrast dark 1`] = `
+{
+  "accent": "#0078D4",
+  "background": "#000000",
+  "cursor": "#FFFFFF",
+  "details": "darker",
+  "foreground": "#FFFFFF",
+  "name": "VSCode High Contrast Dark",
+  "terminal_colors": {
+    "bright": {
+      "black": "#7F7F7F",
+      "blue": "#5C5CFF",
+      "cyan": "#00FFFF",
+      "green": "#00FF00",
+      "magenta": "#FF00FF",
+      "red": "#FF0000",
+      "white": "#FFFFFF",
+      "yellow": "#FFFF00",
+    },
+    "normal": {
+      "black": "#000000",
+      "blue": "#0000EE",
+      "cyan": "#00CDCD",
+      "green": "#00CD00",
+      "magenta": "#CD00CD",
+      "red": "#CD0000",
+      "white": "#E5E5E5",
+      "yellow": "#CDCD00",
+    },
+  },
+}
+`;
