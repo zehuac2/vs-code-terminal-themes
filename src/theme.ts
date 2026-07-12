@@ -58,7 +58,14 @@ function isRequiredThemeColorKey(key: ThemeColorKey): key is RequiredThemeColorK
   return REQUIRED_THEME_COLOR_KEY_SET.has(key);
 }
 
-export const ITERM2_EXTRA_COLOR_KEYS = ['bold', 'link', 'underline'] as const;
+export const ITERM2_EXTRA_COLOR_KEYS = [
+  'bold',
+  'link',
+  'underline',
+  'badge',
+  'cursorGuide',
+  'matchBackground',
+] as const;
 export type Iterm2ExtraColorKey = typeof ITERM2_EXTRA_COLOR_KEYS[number];
 
 export interface ThemeDefinition {
