@@ -20,15 +20,11 @@ describe('exportForIterm2', () => {
             hcDark: '#333333',
             hcLight: '#444444',
           },
-        },
-        iterm2: {
-          colors: {
-            bold: {
-              light: '#aaaaaa',
-              dark: '#bbbbbb',
-              hcDark: '#cccccc',
-              hcLight: '#dddddd',
-            },
+          bold: {
+            light: '#aaaaaa',
+            dark: '#bbbbbb',
+            hcDark: '#cccccc',
+            hcLight: '#dddddd',
           },
         },
       },
@@ -60,37 +56,56 @@ describe('exportForIterm2', () => {
     expect(plist['Link Color']).toBeDefined();
     expect(plist['Link Color (Light)']).toBeDefined();
     expect(plist['Link Color (Dark)']).toBeDefined();
-    expect(plist['Underline Color']).toBeUndefined();
+    expect(plist['Underline Color']).toBeDefined();
   });
 
-  it('falls back to the foreground color for bold when the theme defines none', () => {
+  it('derives bold, underline, and cursor guide from the theme via selectors', () => {
     const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
 
     expect(plist['Bold Color']).toEqual(plist['Foreground Color']);
     expect(plist['Bold Color (Light)']).toEqual(plist['Foreground Color (Light)']);
     expect(plist['Bold Color (Dark)']).toEqual(plist['Foreground Color (Dark)']);
-  });
 
-  it('falls back to palette-derived colors for badge, cursor guide, match background, and link', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
-    const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
-
-    expect(plist['Badge Color']).toEqual(plist['Ansi 1 Color']);
-    expect(plist['Badge Color (Light)']).toEqual(plist['Ansi 1 Color (Light)']);
-    expect(plist['Badge Color (Dark)']).toEqual(plist['Ansi 1 Color (Dark)']);
-
-    expect(plist['Match Background Color']).toEqual(plist['Ansi 3 Color']);
-    expect(plist['Match Background Color (Light)']).toEqual(plist['Ansi 3 Color (Light)']);
-    expect(plist['Match Background Color (Dark)']).toEqual(plist['Ansi 3 Color (Dark)']);
+    expect(plist['Underline Color']).toEqual(plist['Link Color']);
+    expect(plist['Underline Color (Light)']).toEqual(plist['Link Color (Light)']);
+    expect(plist['Underline Color (Dark)']).toEqual(plist['Link Color (Dark)']);
 
     expect(plist['Cursor Guide Color']).toEqual(plist['Selection Color']);
     expect(plist['Cursor Guide Color (Light)']).toEqual(plist['Selection Color (Light)']);
     expect(plist['Cursor Guide Color (Dark)']).toEqual(plist['Selection Color (Dark)']);
+  });
 
-    expect(plist['Link Color']).toEqual(plist['Ansi 4 Color']);
-    expect(plist['Link Color (Light)']).toEqual(plist['Ansi 4 Color (Light)']);
-    expect(plist['Link Color (Dark)']).toEqual(plist['Ansi 4 Color (Dark)']);
+  it('uses the theme-defined VS Code-sourced colors for badge, link, and match background', () => {
+    const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
+    const plist = parse(exportForIterm2(resolvedTheme)) as Record<
+      string,
+      Record<string, number | string>
+    >;
+
+    // These carry concrete values sourced from VS Code (see src/themes.ts), no
+    // longer synthesized from an ANSI palette color.
+    expect(plist['Badge Color (Light)']).toEqual({
+      'Alpha Component': 1,
+      'Blue Component': 0xcc / 255,
+      'Color Space': 'sRGB',
+      'Green Component': 0x7a / 255,
+      'Red Component': 0x00 / 255,
+    });
+    expect(plist['Link Color (Dark)']).toEqual({
+      'Alpha Component': 1,
+      'Blue Component': 0xff / 255,
+      'Color Space': 'sRGB',
+      'Green Component': 0x94 / 255,
+      'Red Component': 0x37 / 255,
+    });
+    expect(plist['Match Background Color (Dark)']).toEqual({
+      'Alpha Component': 1,
+      'Blue Component': 0x6a / 255,
+      'Color Space': 'sRGB',
+      'Green Component': 0x5c / 255,
+      'Red Component': 0x51 / 255,
+    });
   });
 
   it('composites translucent colors onto the active theme background', () => {

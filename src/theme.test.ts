@@ -131,15 +131,11 @@ describe('resolveTheme', () => {
             hcDark: '#333333',
             hcLight: '#444444',
           },
-        },
-        iterm2: {
-          colors: {
-            bold: {
-              light: '#aaaaaa',
-              dark: '#bbbbbb',
-              hcDark: '#cccccc',
-              hcLight: '#dddddd',
-            },
+          bold: {
+            light: '#aaaaaa',
+            dark: '#bbbbbb',
+            hcDark: '#cccccc',
+            hcLight: '#dddddd',
           },
         },
       },
@@ -150,7 +146,52 @@ describe('resolveTheme', () => {
     expect(resolvedTheme.colors.ansiBlue.dark).toBe('#010203');
     expect(resolvedTheme.colors.ansiBlue.light).toBe(COMPLETE_TEST_COLORS.ansiBlue.light);
     expect(resolvedTheme.colors.selectionBackground?.hcLight).toBe('#444444');
-    expect(resolvedTheme.iterm2.colors.bold?.dark).toBe('#bbbbbb');
+    expect(resolvedTheme.colors.bold?.dark).toBe('#bbbbbb');
+  });
+
+  it('resolves a color selector against the theme\'s own resolved colors', () => {
+    const themes = defineThemes({
+      parent: {
+        colors: {
+          ...COMPLETE_TEST_COLORS,
+          bold: (theme) => theme.colors.foreground,
+        },
+      },
+      child: {
+        extends: 'parent',
+        colors: {
+          foreground: {
+            light: '#123456',
+            dark: '#654321',
+            hcDark: '#654321',
+            hcLight: '#123456',
+          },
+        },
+      },
+    });
+
+    const parent = resolveTheme(themes, 'parent');
+    const child = resolveTheme(themes, 'child');
+
+    expect(parent.colors.bold?.light).toBe(COMPLETE_TEST_COLORS.foreground.light);
+    // The selector re-resolves against the child's own overridden foreground,
+    // rather than sticking to the parent's value.
+    expect(child.colors.bold?.light).toBe('#123456');
+    expect(child.colors.bold?.dark).toBe('#654321');
+  });
+
+  it('rejects color selector cycles', () => {
+    const themes = defineThemes({
+      broken: {
+        colors: {
+          ...COMPLETE_TEST_COLORS,
+          bold: (theme) => theme.colors.foreground,
+          foreground: (theme) => theme.colors.bold,
+        },
+      },
+    });
+
+    expect(() => resolveTheme(themes, 'broken')).toThrow('color selector cycle');
   });
 
   it('rejects unknown parent themes', () => {

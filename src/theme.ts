@@ -44,7 +44,28 @@ export const CORE_THEME_COLOR_KEYS = [
 
 export type CoreThemeColorKey = typeof CORE_THEME_COLOR_KEYS[number];
 
-export const THEME_COLOR_KEYS = [...ANSI_THEME_COLOR_KEYS, ...CORE_THEME_COLOR_KEYS] as const;
+/**
+ * Colors with no first-class VS Code equivalent. They exist purely to drive
+ * terminal-specific decorations (e.g. iTerm2's bold/link/badge colors) but are
+ * still modeled as terminal-agnostic theme colors so any generator can adopt
+ * them — see {@link ColorSelector} for how a theme can derive one of these
+ * from another resolved color instead of specifying it directly.
+ */
+export const EXTRA_THEME_COLOR_KEYS = [
+  'bold',
+  'link',
+  'underline',
+  'badge',
+  'cursorGuide',
+  'matchBackground',
+] as const;
+export type ExtraThemeColorKey = typeof EXTRA_THEME_COLOR_KEYS[number];
+
+export const THEME_COLOR_KEYS = [
+  ...ANSI_THEME_COLOR_KEYS,
+  ...CORE_THEME_COLOR_KEYS,
+  ...EXTRA_THEME_COLOR_KEYS,
+] as const;
 export type ThemeColorKey = typeof THEME_COLOR_KEYS[number];
 
 export const REQUIRED_THEME_COLOR_KEYS = [...ANSI_THEME_COLOR_KEYS, 'background', 'foreground'] as const;
@@ -58,30 +79,31 @@ function isRequiredThemeColorKey(key: ThemeColorKey): key is RequiredThemeColorK
   return REQUIRED_THEME_COLOR_KEY_SET.has(key);
 }
 
-export const ITERM2_EXTRA_COLOR_KEYS = [
-  'bold',
-  'link',
-  'underline',
-  'badge',
-  'cursorGuide',
-  'matchBackground',
-] as const;
-export type Iterm2ExtraColorKey = typeof ITERM2_EXTRA_COLOR_KEYS[number];
+/**
+ * Derives a color from the theme's own resolved colors instead of specifying
+ * one directly. Useful for colors that should always track another color
+ * (e.g. `bold` tracking `foreground`) across inheritance, even when a child
+ * theme overrides the source color.
+ *
+ * @returns The derived color, or `undefined` to leave the key unset.
+ */
+export type ColorSelector = (theme: ResolvedTheme) => ColorValue | undefined;
+
+export type ColorDefinition = ColorOverride | ColorSelector;
+
+/** Type guard: `true` when `value` is a {@link ColorSelector} rather than a literal color. */
+export function isColorSelector(value: ColorDefinition): value is ColorSelector {
+  return typeof value === 'function';
+}
 
 export interface ThemeDefinition {
   displayName?: string;
   extends?: string;
-  colors?: Partial<Record<ThemeColorKey, ColorOverride>>;
-  iterm2?: {
-    colors?: Partial<Record<Iterm2ExtraColorKey, ColorOverride>>;
-  };
+  colors?: Partial<Record<ThemeColorKey, ColorDefinition>>;
 }
 
 export interface ResolvedTheme {
   colors: Record<RequiredThemeColorKey, ColorValue> & Partial<Record<OptionalThemeColorKey, ColorValue>>;
-  iterm2: {
-    colors: Partial<Record<Iterm2ExtraColorKey, ColorValue>>;
-  };
 }
 
 /**
@@ -103,7 +125,7 @@ export function defineThemes<const T extends Record<string, ThemeDefinition>>(th
  *   {@link validateColorValue}.
  */
 function mergeColorValue(
-  parent: ColorValue | undefined,
+  parent: Partial<ColorValue> | undefined,
   override: ColorOverride | undefined,
 ): Partial<ColorValue> | undefined {
   if (!parent && !override) {
@@ -167,63 +189,27 @@ function mapDefined<const T, U>(
 }
 
 /**
- * Resolves a group of colors (the theme palette or the iTerm2 extras) into
- * `[key, value]` entries by merging each key's override onto the parent and
- * validating the result. Keys whose optional colors are absent are dropped.
+ * Walks a theme's `extends` chain and returns the definitions from root
+ * ancestor to the requested theme (inclusive), the order later folding needs
+ * to layer overrides correctly.
  *
- * @param themeName - Theme being resolved, used in error messages.
- * @param pathPrefix - Path prefix for the group (e.g. `colors`,
- *   `iterm2.colors`), used in error messages.
- * @param keys - The color keys to resolve.
- * @param parentColors - Already-resolved colors inherited from the parent theme.
- * @param overrideColors - This theme's own color overrides, if any.
- * @param isRequired - Predicate deciding whether a missing key is an error.
+ * @throws If a referenced theme is not defined, or an inheritance cycle exists.
  */
-function resolveColorEntries<K extends string>(
-  themeName: string,
-  pathPrefix: string,
-  keys: readonly K[],
-  parentColors: Partial<Record<K, ColorValue>>,
-  overrideColors: Partial<Record<K, ColorOverride>> | undefined,
-  isRequired: (key: K) => boolean,
-): Array<[K, ColorValue]> {
-  return mapDefined(keys, (colorKey) => {
-    const merged = mergeColorValue(parentColors[colorKey], overrideColors?.[colorKey]);
-    const resolved = validateColorValue(
-      themeName,
-      `${pathPrefix}.${colorKey}`,
-      merged,
-      isRequired(colorKey),
-    );
-
-    return resolved ? [colorKey, resolved] : undefined;
-  });
-}
-
-/**
- * Resolves a named theme into a fully-populated {@link ResolvedTheme} by
- * recursively resolving its `extends` parent and layering this theme's overrides
- * on top. Results are memoized within the call, and inheritance cycles are
- * detected.
- *
- * @param themes - The map of all available theme definitions.
- * @param themeName - The theme to resolve.
- * @throws If the theme (or a referenced parent) is not defined, an inheritance
- *   cycle exists, or a required color is missing after resolution.
- */
-export function resolveTheme(
+function collectThemeChain(
   themes: Record<string, ThemeDefinition>,
   themeName: string,
-): ResolvedTheme {
-  const resolvedThemes = new Map<string, ResolvedTheme>();
-  const activeThemeNames = new Set<string>();
+): ThemeDefinition[] {
+  const chain: ThemeDefinition[] = [];
+  const visitedThemeNames = new Set<string>();
 
-  const resolveByName = (currentThemeName: string): ResolvedTheme => {
-    const cached = resolvedThemes.get(currentThemeName);
+  let currentThemeName = themeName;
 
-    if (cached) {
-      return cached;
+  for (;;) {
+    if (visitedThemeNames.has(currentThemeName)) {
+      throw new Error(`Theme inheritance cycle detected while resolving "${currentThemeName}".`);
     }
+
+    visitedThemeNames.add(currentThemeName);
 
     const definition = themes[currentThemeName];
 
@@ -231,45 +217,120 @@ export function resolveTheme(
       throw new Error(`Theme "${currentThemeName}" is not defined.`);
     }
 
-    if (activeThemeNames.has(currentThemeName)) {
-      throw new Error(`Theme inheritance cycle detected while resolving "${currentThemeName}".`);
+    chain.push(definition);
+
+    if (!definition.extends) {
+      break;
     }
 
-    activeThemeNames.add(currentThemeName);
+    currentThemeName = definition.extends;
+  }
 
-    const parent = definition.extends ? resolveByName(definition.extends) : undefined;
-    const resolvedTheme: ResolvedTheme = {
-      colors: Object.fromEntries(
-        resolveColorEntries(
-          currentThemeName,
-          'colors',
-          THEME_COLOR_KEYS,
-          parent?.colors ?? {},
-          definition.colors,
-          isRequiredThemeColorKey,
-        ),
-      ) as ResolvedTheme['colors'],
-      iterm2: {
-        colors: Object.fromEntries(
-          resolveColorEntries(
-            currentThemeName,
-            'iterm2.colors',
-            ITERM2_EXTRA_COLOR_KEYS,
-            parent?.iterm2.colors ?? {},
-            definition.iterm2?.colors,
-            () => false,
-          ),
-        ),
-      },
-    };
+  return chain.reverse();
+}
 
-    activeThemeNames.delete(currentThemeName);
-    resolvedThemes.set(currentThemeName, resolvedTheme);
+/**
+ * Folds a root-to-leaf chain of theme definitions into one effective
+ * {@link ColorDefinition} per key: concrete overrides merge onto the
+ * accumulated color variant by variant, while a selector replaces whatever
+ * came before it (and is itself replaced by a later concrete override).
+ */
+function foldThemeColorChain(
+  chain: readonly ThemeDefinition[],
+): Partial<Record<ThemeColorKey, ColorDefinition>> {
+  const effectiveByKey: Partial<Record<ThemeColorKey, ColorDefinition>> = {};
 
-    return resolvedTheme;
-  };
+  for (const definition of chain) {
+    for (const key of THEME_COLOR_KEYS) {
+      const entry = definition.colors?.[key];
 
-  return resolveByName(themeName);
+      if (entry === undefined) {
+        continue;
+      }
+
+      if (isColorSelector(entry)) {
+        effectiveByKey[key] = entry;
+        continue;
+      }
+
+      const previous = effectiveByKey[key];
+      const previousColorValue = previous && !isColorSelector(previous) ? previous : undefined;
+
+      effectiveByKey[key] = mergeColorValue(previousColorValue, entry);
+    }
+  }
+
+  return effectiveByKey;
+}
+
+/**
+ * Resolves a named theme into a fully-populated {@link ResolvedTheme} by
+ * flattening its `extends` chain into one effective color definition per key,
+ * then resolving each key — invoking {@link ColorSelector}s lazily against the
+ * theme's own resolved colors so they can derive from (and track overrides of)
+ * any other key. Selector invocations and color completeness are memoized per
+ * key, and both inheritance cycles and selector reference cycles are detected.
+ *
+ * @param themes - The map of all available theme definitions.
+ * @param themeName - The theme to resolve.
+ * @throws If the theme (or a referenced parent) is not defined, an inheritance
+ *   or selector cycle exists, or a required color is missing after resolution.
+ */
+export function resolveTheme(
+  themes: Record<string, ThemeDefinition>,
+  themeName: string,
+): ResolvedTheme {
+  const chain = collectThemeChain(themes, themeName);
+  const effectiveByKey = foldThemeColorChain(chain);
+
+  const resolvedByKey = new Map<ThemeColorKey, ColorValue | undefined>();
+  const resolvingKeys = new Set<ThemeColorKey>();
+
+  function resolveKey(key: ThemeColorKey): ColorValue | undefined {
+    if (resolvedByKey.has(key)) {
+      return resolvedByKey.get(key);
+    }
+
+    if (resolvingKeys.has(key)) {
+      throw new Error(
+        `Theme "${themeName}" has a color selector cycle involving "colors.${key}".`,
+      );
+    }
+
+    resolvingKeys.add(key);
+
+    const definition = effectiveByKey[key];
+    const isRequired = isRequiredThemeColorKey(key);
+
+    const value = definition === undefined
+      ? undefined
+      : isColorSelector(definition)
+        ? definition(themeProxy)
+        : validateColorValue(themeName, `colors.${key}`, definition, isRequired);
+
+    if (value === undefined && isRequired) {
+      throw new Error(`Theme "${themeName}" is missing required color "colors.${key}".`);
+    }
+
+    resolvingKeys.delete(key);
+    resolvedByKey.set(key, value);
+
+    return value;
+  }
+
+  const colorsProxy = new Proxy({} as ResolvedTheme['colors'], {
+    get: (_target, key) => (typeof key === 'string' ? resolveKey(key as ThemeColorKey) : undefined),
+  });
+  const themeProxy: ResolvedTheme = { colors: colorsProxy };
+
+  const colors = Object.fromEntries(
+    mapDefined(THEME_COLOR_KEYS, (key) => {
+      const value = resolveKey(key);
+      return value ? ([key, value] as const) : undefined;
+    }),
+  ) as ResolvedTheme['colors'];
+
+  return { colors };
 }
 
 export const ANSI_THEME_COLOR_TO_INDEX: Record<AnsiThemeColorKey, number> = {

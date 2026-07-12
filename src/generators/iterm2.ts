@@ -4,9 +4,8 @@ import { compositeColor } from '@/color';
 import {
   ANSI_THEME_COLOR_KEYS,
   ANSI_THEME_COLOR_TO_INDEX,
-  ITERM2_EXTRA_COLOR_KEYS,
+  EXTRA_THEME_COLOR_KEYS,
   type ColorValue,
-  type Iterm2ExtraColorKey,
   type ResolvedTheme,
 } from '@/theme';
 
@@ -39,24 +38,6 @@ const EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
   cursorGuide: 'Cursor Guide Color',
   matchBackground: 'Match Background Color',
 } as const;
-
-/**
- * iTerm2 keeps a profile's existing value for any key a preset omits, so these
- * keys always fall back to a palette color derived from the theme when the
- * theme itself defines no explicit override. This avoids inheriting a stale
- * color from a previously applied preset.
- */
-const EXTRA_ITERM2_COLOR_FALLBACK: Record<
-  Iterm2ExtraColorKey,
-  (theme: ResolvedTheme) => ColorValue | undefined
-> = {
-  bold: (theme) => theme.colors.foreground,
-  link: (theme) => theme.colors.ansiBlue,
-  underline: () => undefined,
-  badge: (theme) => theme.colors.ansiRed,
-  cursorGuide: (theme) => theme.colors.selectionBackground,
-  matchBackground: (theme) => theme.colors.ansiYellow,
-};
 
 type ITerm2PresetEntry = [string, ITerm2Color];
 
@@ -127,10 +108,8 @@ export function exportForIterm2(
   ).flat();
 
   const extraEntries = compactEntries(
-    ITERM2_EXTRA_COLOR_KEYS.map((themeColorName) => {
-      const colorValue =
-        theme.iterm2.colors[themeColorName] ??
-        EXTRA_ITERM2_COLOR_FALLBACK[themeColorName](theme);
+    EXTRA_THEME_COLOR_KEYS.map((themeColorName) => {
+      const colorValue = theme.colors[themeColorName];
 
       return colorValue
         ? createPresetEntries(
