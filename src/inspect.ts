@@ -11,4 +11,16 @@ if (args.length !== 1 || !fileName) {
 const input = await Bun.file(fileName).arrayBuffer();
 const result = parse(input);
 
-console.log(result);
+if (!result) {
+  throw new Error('Failed to parse');
+}
+
+console.group('Keys');
+
+Object.keys(result)
+  .toSorted()
+  .forEach((v) => {
+    console.log(v);
+  });
+
+console.groupEnd();
