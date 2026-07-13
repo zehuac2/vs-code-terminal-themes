@@ -1,10 +1,16 @@
-import { defineThemes, type ColorOverride, type ThemeColorKey } from '@/theme';
+import { type ThemeColorKey } from '@/theme';
 
-type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
+export type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
 
-type ThemeColors = Partial<Record<ThemeColorKey, ColorOverride>>;
+/**
+ * Theme colors with a literal per-kind default. Excludes the
+ * selector-backed extras (`bold`, `underline`, `cursorGuide`), which have no
+ * VS Code color of their own and instead derive from another resolved color —
+ * see {@link EXTRA_SELECTOR_COLORS}.
+ */
+export type DefaultThemeColorKey = Exclude<ThemeColorKey, 'bold' | 'underline' | 'cursorGuide'>;
 
-const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> = {
+export const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<DefaultThemeColorKey, string>> = {
   light: {
     ansiBlack: '#000000',
     ansiRed: '#cd3131',
@@ -30,6 +36,12 @@ const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> =
     cursorText: '#ffffff',
     border: '#2A2B2CFF',
     tabActiveBorder: '#005FB8',
+    // VS Code: textLink.foreground
+    link: '#006AB1',
+    // VS Code: activityBarBadge.background
+    badge: '#007ACC',
+    // VS Code: editor.findMatchBackground
+    matchBackground: '#A8AC94',
   },
   dark: {
     ansiBlack: '#000000',
@@ -56,6 +68,12 @@ const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> =
     cursorText: '#1f1f1f',
     border: '#2A2B2CFF',
     tabActiveBorder: '#0078D4',
+    // VS Code: textLink.foreground
+    link: '#3794FF',
+    // VS Code: activityBarBadge.background
+    badge: '#007ACC',
+    // VS Code: editor.findMatchBackground
+    matchBackground: '#515C6A',
   },
   hcDark: {
     ansiBlack: '#000000',
@@ -82,6 +100,15 @@ const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> =
     cursorText: '#000000',
     border: '#2A2B2CFF',
     tabActiveBorder: '#0078D4',
+    // VS Code: textLink.foreground
+    link: '#21A6FF',
+    // VS Code: activityBarBadge.foreground. The .background used by the other
+    // kinds is #000000 here, which is invisible as iTerm2's badge *text* on the
+    // black hcDark background; VS Code draws this badge white-on-black, so the
+    // foreground is the color that actually carries it.
+    badge: '#FFFFFF',
+    // VS Code: editor.findMatchBackground is unset for hcDark; reuses the dark value
+    matchBackground: '#515C6A',
   },
   hcLight: {
     ansiBlack: '#292929',
@@ -108,79 +135,14 @@ const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<ThemeColorKey, string>> =
     cursorText: '#ffffff',
     border: '#2A2B2CFF',
     tabActiveBorder: '#005FB8',
+    // VS Code: textLink.foreground
+    link: '#0F4A85',
+    // VS Code: activityBarBadge.background
+    badge: '#0F4A85',
+    // Not VS Code's terminal.findMatchBackground (#0F4A85): that is a dark fill
+    // paired with a light find-match foreground, and iTerm2 has no match
+    // foreground — matched text keeps this theme's dark foreground (#292929),
+    // which needs a pale fill to stay legible.
+    matchBackground: '#FFD700',
   },
 };
-
-function pairedColor(light: string, dark: string): ColorOverride {
-  return {
-    light,
-    dark,
-    hcDark: dark,
-    hcLight: light,
-  };
-}
-
-function pairedDefaultColors(lightKind: ThemeKind, darkKind: ThemeKind): ThemeColors {
-  return Object.fromEntries(
-    Object.keys(DEFAULT_COLORS_BY_KIND[lightKind]).map((key) => {
-      const colorKey = key as ThemeColorKey;
-      return [
-        colorKey,
-        pairedColor(
-          DEFAULT_COLORS_BY_KIND[lightKind][colorKey],
-          DEFAULT_COLORS_BY_KIND[darkKind][colorKey],
-        ),
-      ];
-    }),
-  ) as ThemeColors;
-}
-
-export const themes = defineThemes({
-  'Visual Studio': {
-    displayName: 'Visual Studio',
-    colors: {
-      ...pairedDefaultColors('light', 'dark'),
-      selectionBackground: pairedColor('#E5EBF1', '#3A3D41'),
-    },
-  },
-  Plus: {
-    displayName: 'Plus',
-    extends: 'Visual Studio',
-  },
-  Modern: {
-    displayName: 'Modern',
-    extends: 'Plus',
-    colors: {
-      foreground: pairedColor('#3B3B3B', '#CCCCCC'),
-      cursor: {
-        light: '#005FB8',
-      },
-      selectionBackground: {
-        light: '#E5EBF1',
-      },
-      tabActiveBorder: pairedColor('#005FB8', '#0078D4'),
-    },
-  },
-  'High Contrast': {
-    displayName: 'High Contrast',
-    colors: pairedDefaultColors('hcLight', 'hcDark'),
-  },
-  '2026': {
-    displayName: '2026',
-    extends: 'Modern',
-    colors: {
-      background: {
-        dark: '#191A1B',
-      },
-      selectionBackground: pairedColor('#0069CC26', '#3994BC33'),
-      cursor: pairedColor('#202020', '#bfbfbf'),
-      cursorText: pairedColor('#FFFFFF', '#191A1B'),
-      border: {
-        dark: '#2A2B2CFF',
-      },
-      tabActiveBorder: {
-        dark: '#3994BC00',
-      },
-    },
-  },
-});

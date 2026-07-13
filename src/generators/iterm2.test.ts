@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from '@plist/plist';
-import { exportForIterm2 } from '@/generators/iterm2';
+import { EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR, exportForIterm2 } from '@/generators/iterm2';
 import { defineThemes, resolveTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
+import { DEFAULT_COLORS_BY_KIND } from '@/themes/palette';
+
+/** Independently encodes an opaque `#rrggbb` color the way an iTerm2 preset does. */
+function iterm2Color(hex: string): Record<string, number | string> {
+  return {
+    'Alpha Component': 1,
+    'Blue Component': parseInt(hex.slice(5, 7), 16) / 255,
+    'Color Space': 'sRGB',
+    'Green Component': parseInt(hex.slice(3, 5), 16) / 255,
+    'Red Component': parseInt(hex.slice(1, 3), 16) / 255,
+  };
+}
 
 describe('exportForIterm2', () => {
   it('exports core terminal colors, ansi colors, and iTerm2 extras', () => {
@@ -20,15 +32,11 @@ describe('exportForIterm2', () => {
             hcDark: '#333333',
             hcLight: '#444444',
           },
-        },
-        iterm2: {
-          colors: {
-            bold: {
-              light: '#aaaaaa',
-              dark: '#bbbbbb',
-              hcDark: '#cccccc',
-              hcLight: '#dddddd',
-            },
+          bold: {
+            light: '#aaaaaa',
+            dark: '#bbbbbb',
+            hcDark: '#cccccc',
+            hcLight: '#dddddd',
           },
         },
       },
@@ -60,37 +68,70 @@ describe('exportForIterm2', () => {
     expect(plist['Link Color']).toBeDefined();
     expect(plist['Link Color (Light)']).toBeDefined();
     expect(plist['Link Color (Dark)']).toBeDefined();
-    expect(plist['Underline Color']).toBeUndefined();
+    expect(plist['Underline Color']).toBeDefined();
   });
 
-  it('falls back to the foreground color for bold when the theme defines none', () => {
+  it('derives bold, underline, and cursor guide from the theme via selectors', () => {
     const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
 
     expect(plist['Bold Color']).toEqual(plist['Foreground Color']);
     expect(plist['Bold Color (Light)']).toEqual(plist['Foreground Color (Light)']);
     expect(plist['Bold Color (Dark)']).toEqual(plist['Foreground Color (Dark)']);
-  });
 
-  it('falls back to palette-derived colors for badge, cursor guide, match background, and link', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
-    const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
-
-    expect(plist['Badge Color']).toEqual(plist['Ansi 1 Color']);
-    expect(plist['Badge Color (Light)']).toEqual(plist['Ansi 1 Color (Light)']);
-    expect(plist['Badge Color (Dark)']).toEqual(plist['Ansi 1 Color (Dark)']);
-
-    expect(plist['Match Background Color']).toEqual(plist['Ansi 3 Color']);
-    expect(plist['Match Background Color (Light)']).toEqual(plist['Ansi 3 Color (Light)']);
-    expect(plist['Match Background Color (Dark)']).toEqual(plist['Ansi 3 Color (Dark)']);
+    expect(plist['Underline Color']).toEqual(plist['Link Color']);
+    expect(plist['Underline Color (Light)']).toEqual(plist['Link Color (Light)']);
+    expect(plist['Underline Color (Dark)']).toEqual(plist['Link Color (Dark)']);
 
     expect(plist['Cursor Guide Color']).toEqual(plist['Selection Color']);
     expect(plist['Cursor Guide Color (Light)']).toEqual(plist['Selection Color (Light)']);
     expect(plist['Cursor Guide Color (Dark)']).toEqual(plist['Selection Color (Dark)']);
+  });
 
-    expect(plist['Link Color']).toEqual(plist['Ansi 4 Color']);
-    expect(plist['Link Color (Light)']).toEqual(plist['Ansi 4 Color (Light)']);
-    expect(plist['Link Color (Dark)']).toEqual(plist['Ansi 4 Color (Dark)']);
+  it('uses the theme-defined VS Code-sourced colors for badge, link, and match background', () => {
+    const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
+    const plist = parse(exportForIterm2(resolvedTheme)) as Record<
+      string,
+      Record<string, number | string>
+    >;
+
+    // These carry concrete values from the palette (see src/themes/palette.ts),
+    // no longer synthesized from an ANSI palette color.
+    expect(plist['Badge Color (Light)']).toEqual(iterm2Color(DEFAULT_COLORS_BY_KIND.light.badge));
+    expect(plist['Link Color (Dark)']).toEqual(iterm2Color(DEFAULT_COLORS_BY_KIND.dark.link));
+    expect(plist['Match Background Color (Dark)']).toEqual(
+      iterm2Color(DEFAULT_COLORS_BY_KIND.dark.matchBackground),
+    );
+  });
+
+  // iTerm2 keeps a profile's existing value for any key a preset omits, so a
+  // theme that fails to define one of these extras does not fall back to a sane
+  // default — the key silently keeps its color from the last applied preset.
+  it.each(Object.keys(builtInThemes))(
+    'emits every extra color for the %s theme, so none can go stale',
+    (themeName) => {
+      const resolvedTheme = resolveTheme(builtInThemes, themeName);
+      const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
+
+      for (const colorName of Object.values(EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR)) {
+        expect(plist[colorName]).toBeDefined();
+        expect(plist[`${colorName} (Light)`]).toBeDefined();
+        expect(plist[`${colorName} (Dark)`]).toBeDefined();
+      }
+    },
+  );
+
+  it('keeps the High Contrast badge visible against its background', () => {
+    const resolvedTheme = resolveTheme(builtInThemes, 'High Contrast');
+    const plist = parse(exportForIterm2(resolvedTheme)) as Record<
+      string,
+      Record<string, number | string>
+    >;
+
+    // VS Code's hcDark activityBarBadge.background is #000000 — the same as the
+    // hcDark terminal background — which would render the badge text invisible.
+    expect(plist['Badge Color (Dark)']).not.toEqual(plist['Background Color (Dark)']);
+    expect(plist['Badge Color (Dark)']).toEqual(iterm2Color('#FFFFFF'));
   });
 
   it('composites translucent colors onto the active theme background', () => {
