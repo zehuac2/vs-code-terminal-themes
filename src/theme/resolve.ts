@@ -1,118 +1,24 @@
-export const COLOR_VARIANTS = ['light', 'dark', 'hcDark', 'hcLight'] as const;
-export type ColorVariant = typeof COLOR_VARIANTS[number];
-
-export interface ColorValue {
-  light: string;
-  dark: string;
-  hcDark: string;
-  hcLight: string;
-}
-
-export type ColorOverride = Partial<ColorValue>;
-
-export const ANSI_THEME_COLOR_KEYS = [
-  'ansiBlack',
-  'ansiRed',
-  'ansiGreen',
-  'ansiYellow',
-  'ansiBlue',
-  'ansiMagenta',
-  'ansiCyan',
-  'ansiWhite',
-  'ansiBrightBlack',
-  'ansiBrightRed',
-  'ansiBrightGreen',
-  'ansiBrightYellow',
-  'ansiBrightBlue',
-  'ansiBrightMagenta',
-  'ansiBrightCyan',
-  'ansiBrightWhite',
-] as const;
-
-export type AnsiThemeColorKey = typeof ANSI_THEME_COLOR_KEYS[number];
-
-export const CORE_THEME_COLOR_KEYS = [
-  'background',
-  'foreground',
-  'selectionBackground',
-  'selectionForeground',
-  'cursor',
-  'cursorText',
-  'border',
-  'tabActiveBorder',
-] as const;
-
-export type CoreThemeColorKey = typeof CORE_THEME_COLOR_KEYS[number];
-
-/**
- * Colors with no first-class VS Code equivalent. They exist purely to drive
- * terminal-specific decorations (e.g. iTerm2's bold/link/badge colors) but are
- * still modeled as terminal-agnostic theme colors so any generator can adopt
- * them — see {@link ColorSelector} for how a theme can derive one of these
- * from another resolved color instead of specifying it directly.
- */
-export const EXTRA_THEME_COLOR_KEYS = [
-  'bold',
-  'link',
-  'underline',
-  'badge',
-  'cursorGuide',
-  'matchBackground',
-] as const;
-export type ExtraThemeColorKey = typeof EXTRA_THEME_COLOR_KEYS[number];
-
-export const THEME_COLOR_KEYS = [
-  ...ANSI_THEME_COLOR_KEYS,
-  ...CORE_THEME_COLOR_KEYS,
-  ...EXTRA_THEME_COLOR_KEYS,
-] as const;
-export type ThemeColorKey = typeof THEME_COLOR_KEYS[number];
-
-export const REQUIRED_THEME_COLOR_KEYS = [...ANSI_THEME_COLOR_KEYS, 'background', 'foreground'] as const;
-export type RequiredThemeColorKey = typeof REQUIRED_THEME_COLOR_KEYS[number];
-export type OptionalThemeColorKey = Exclude<ThemeColorKey, RequiredThemeColorKey>;
+import {
+  COLOR_VARIANTS,
+  REQUIRED_THEME_COLOR_KEYS,
+  THEME_COLOR_KEYS,
+  type ColorOverride,
+  type ColorValue,
+  type RequiredThemeColorKey,
+  type ThemeColorKey,
+} from './colors';
+import {
+  isColorSelector,
+  type ColorDefinition,
+  type ResolvedTheme,
+  type ThemeDefinition,
+} from './definition';
 
 const REQUIRED_THEME_COLOR_KEY_SET = new Set<ThemeColorKey>(REQUIRED_THEME_COLOR_KEYS);
 
 /** Type guard: `true` when `key` must be fully defined on every resolved theme. */
 function isRequiredThemeColorKey(key: ThemeColorKey): key is RequiredThemeColorKey {
   return REQUIRED_THEME_COLOR_KEY_SET.has(key);
-}
-
-/**
- * Derives a color from the theme's own resolved colors instead of specifying
- * one directly. Useful for colors that should always track another color
- * (e.g. `bold` tracking `foreground`) across inheritance, even when a child
- * theme overrides the source color.
- *
- * @returns The derived color, or `undefined` to leave the key unset.
- */
-export type ColorSelector = (theme: ResolvedTheme) => ColorValue | undefined;
-
-export type ColorDefinition = ColorOverride | ColorSelector;
-
-/** Type guard: `true` when `value` is a {@link ColorSelector} rather than a literal color. */
-export function isColorSelector(value: ColorDefinition): value is ColorSelector {
-  return typeof value === 'function';
-}
-
-export interface ThemeDefinition {
-  displayName?: string;
-  extends?: string;
-  colors?: Partial<Record<ThemeColorKey, ColorDefinition>>;
-}
-
-export interface ResolvedTheme {
-  colors: Record<RequiredThemeColorKey, ColorValue> & Partial<Record<OptionalThemeColorKey, ColorValue>>;
-}
-
-/**
- * Identity helper that preserves the literal types of a theme map while
- * constraining it to {@link ThemeDefinition}. Use it when declaring themes so
- * theme names and color keys stay strongly typed for {@link resolveTheme}.
- */
-export function defineThemes<const T extends Record<string, ThemeDefinition>>(themes: T): T {
-  return themes;
 }
 
 /**
@@ -332,22 +238,3 @@ export function resolveTheme(
 
   return { colors };
 }
-
-export const ANSI_THEME_COLOR_TO_INDEX: Record<AnsiThemeColorKey, number> = {
-  ansiBlack: 0,
-  ansiRed: 1,
-  ansiGreen: 2,
-  ansiYellow: 3,
-  ansiBlue: 4,
-  ansiMagenta: 5,
-  ansiCyan: 6,
-  ansiWhite: 7,
-  ansiBrightBlack: 8,
-  ansiBrightRed: 9,
-  ansiBrightGreen: 10,
-  ansiBrightYellow: 11,
-  ansiBrightBlue: 12,
-  ansiBrightMagenta: 13,
-  ansiBrightCyan: 14,
-  ansiBrightWhite: 15,
-};

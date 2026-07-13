@@ -1,14 +1,6 @@
-import {
-  defineThemes,
-  type ColorDefinition,
-  type ColorOverride,
-  type ResolvedTheme,
-  type ThemeColorKey,
-} from '@/theme';
+import { type ThemeColorKey } from '@/theme';
 
-type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
-
-type ThemeColors = Partial<Record<ThemeColorKey, ColorDefinition>>;
+export type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
 
 /**
  * Theme colors with a literal per-kind default. Excludes the
@@ -16,9 +8,9 @@ type ThemeColors = Partial<Record<ThemeColorKey, ColorDefinition>>;
  * VS Code color of their own and instead derive from another resolved color —
  * see {@link EXTRA_SELECTOR_COLORS}.
  */
-type DefaultThemeColorKey = Exclude<ThemeColorKey, 'bold' | 'underline' | 'cursorGuide'>;
+export type DefaultThemeColorKey = Exclude<ThemeColorKey, 'bold' | 'underline' | 'cursorGuide'>;
 
-const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<DefaultThemeColorKey, string>> = {
+export const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<DefaultThemeColorKey, string>> = {
   light: {
     ansiBlack: '#000000',
     ansiRed: '#cd3131',
@@ -148,95 +140,3 @@ const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<DefaultThemeColorKey, str
     matchBackground: '#0F4A85',
   },
 };
-
-/**
- * Selector-backed extra colors with no first-class VS Code equivalent. They
- * track another resolved color of the same theme so overrides (e.g. Modern's
- * `foreground`) propagate automatically instead of going stale.
- */
-const EXTRA_SELECTOR_COLORS = {
-  // VS Code has no distinct bold color; the terminal reuses the foreground.
-  bold: (theme: ResolvedTheme) => theme.colors.foreground,
-  // Underlined text uses the same color as a link.
-  underline: (theme: ResolvedTheme) => theme.colors.link,
-  // No VS Code terminal analog; track the selection color instead.
-  cursorGuide: (theme: ResolvedTheme) => theme.colors.selectionBackground,
-} satisfies ThemeColors;
-
-function pairedColor(light: string, dark: string): ColorOverride {
-  return {
-    light,
-    dark,
-    hcDark: dark,
-    hcLight: light,
-  };
-}
-
-function pairedDefaultColors(lightKind: ThemeKind, darkKind: ThemeKind): ThemeColors {
-  return Object.fromEntries(
-    Object.keys(DEFAULT_COLORS_BY_KIND[lightKind]).map((key) => {
-      const colorKey = key as DefaultThemeColorKey;
-      return [
-        colorKey,
-        pairedColor(
-          DEFAULT_COLORS_BY_KIND[lightKind][colorKey],
-          DEFAULT_COLORS_BY_KIND[darkKind][colorKey],
-        ),
-      ];
-    }),
-  ) as ThemeColors;
-}
-
-export const themes = defineThemes({
-  'Visual Studio': {
-    displayName: 'Visual Studio',
-    colors: {
-      ...pairedDefaultColors('light', 'dark'),
-      selectionBackground: pairedColor('#E5EBF1', '#3A3D41'),
-      ...EXTRA_SELECTOR_COLORS,
-    },
-  },
-  Plus: {
-    displayName: 'Plus',
-    extends: 'Visual Studio',
-  },
-  Modern: {
-    displayName: 'Modern',
-    extends: 'Plus',
-    colors: {
-      foreground: pairedColor('#3B3B3B', '#CCCCCC'),
-      cursor: {
-        light: '#005FB8',
-      },
-      selectionBackground: {
-        light: '#E5EBF1',
-      },
-      tabActiveBorder: pairedColor('#005FB8', '#0078D4'),
-    },
-  },
-  'High Contrast': {
-    displayName: 'High Contrast',
-    colors: {
-      ...pairedDefaultColors('hcLight', 'hcDark'),
-      ...EXTRA_SELECTOR_COLORS,
-    },
-  },
-  '2026': {
-    displayName: '2026',
-    extends: 'Modern',
-    colors: {
-      background: {
-        dark: '#191A1B',
-      },
-      selectionBackground: pairedColor('#0069CC26', '#3994BC33'),
-      cursor: pairedColor('#202020', '#bfbfbf'),
-      cursorText: pairedColor('#FFFFFF', '#191A1B'),
-      border: {
-        dark: '#2A2B2CFF',
-      },
-      tabActiveBorder: {
-        dark: '#3994BC00',
-      },
-    },
-  },
-});
