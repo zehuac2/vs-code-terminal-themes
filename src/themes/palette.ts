@@ -102,8 +102,11 @@ export const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<DefaultThemeColorK
     tabActiveBorder: '#0078D4',
     // VS Code: textLink.foreground
     link: '#21A6FF',
-    // VS Code: activityBarBadge.background
-    badge: '#000000',
+    // VS Code: activityBarBadge.foreground. The .background used by the other
+    // kinds is #000000 here, which is invisible as iTerm2's badge *text* on the
+    // black hcDark background; VS Code draws this badge white-on-black, so the
+    // foreground is the color that actually carries it.
+    badge: '#FFFFFF',
     // VS Code: editor.findMatchBackground is unset for hcDark; reuses the dark value
     matchBackground: '#515C6A',
   },
@@ -136,7 +139,10 @@ export const DEFAULT_COLORS_BY_KIND: Record<ThemeKind, Record<DefaultThemeColorK
     link: '#0F4A85',
     // VS Code: activityBarBadge.background
     badge: '#0F4A85',
-    // VS Code: terminal.findMatchBackground (editor.findMatchBackground is unset for hcLight)
-    matchBackground: '#0F4A85',
+    // Not VS Code's terminal.findMatchBackground (#0F4A85): that is a dark fill
+    // paired with a light find-match foreground, and iTerm2 has no match
+    // foreground — matched text keeps this theme's dark foreground (#292929),
+    // which needs a pale fill to stay legible.
+    matchBackground: '#FFD700',
   },
 };

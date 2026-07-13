@@ -30,7 +30,13 @@ const CORE_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
   cursorText: 'Cursor Text Color',
 } as const;
 
-const EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
+/**
+ * iTerm2 keeps a profile's existing value for any key a preset omits, so every
+ * one of these must be emitted for every theme — otherwise the key silently
+ * inherits a stale color from the previously applied preset. See
+ * {@link EXTRA_THEME_COLOR_KEYS}.
+ */
+export const EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR = {
   bold: 'Bold Color',
   link: 'Link Color',
   underline: 'Underline Color',

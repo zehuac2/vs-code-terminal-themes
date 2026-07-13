@@ -9,7 +9,7 @@ import {
 } from './colors';
 import {
   isColorSelector,
-  type ColorDefinition,
+  type ColorSelector,
   type ResolvedTheme,
   type ThemeDefinition,
 } from './definition';
@@ -136,15 +136,29 @@ function collectThemeChain(
 }
 
 /**
- * Folds a root-to-leaf chain of theme definitions into one effective
- * {@link ColorDefinition} per key: concrete overrides merge onto the
- * accumulated color variant by variant, while a selector replaces whatever
- * came before it (and is itself replaced by a later concrete override).
+ * A key's definition after flattening the `extends` chain: an optional
+ * {@link ColorSelector} supplying the base color, plus the concrete overrides
+ * layered on top of it.
+ */
+interface EffectiveColor {
+  /** The last selector seen in the chain, if any. */
+  base?: ColorSelector;
+  /** Concrete overrides accumulated since that selector. */
+  override?: Partial<ColorValue>;
+}
+
+/**
+ * Folds a root-to-leaf chain of theme definitions into one {@link EffectiveColor}
+ * per key. Concrete overrides merge variant by variant onto whatever came
+ * before, *without* discarding a selector inherited from an ancestor — so a
+ * child can pin one variant of a selector-backed color and let the selector
+ * keep supplying the rest. A selector, in contrast, resets the key: it replaces
+ * both the base and any overrides accumulated before it.
  */
 function foldThemeColorChain(
   chain: readonly ThemeDefinition[],
-): Partial<Record<ThemeColorKey, ColorDefinition>> {
-  const effectiveByKey: Partial<Record<ThemeColorKey, ColorDefinition>> = {};
+): Partial<Record<ThemeColorKey, EffectiveColor>> {
+  const effectiveByKey: Partial<Record<ThemeColorKey, EffectiveColor>> = {};
 
   for (const definition of chain) {
     for (const key of THEME_COLOR_KEYS) {
@@ -155,14 +169,16 @@ function foldThemeColorChain(
       }
 
       if (isColorSelector(entry)) {
-        effectiveByKey[key] = entry;
+        effectiveByKey[key] = { base: entry };
         continue;
       }
 
       const previous = effectiveByKey[key];
-      const previousColorValue = previous && !isColorSelector(previous) ? previous : undefined;
 
-      effectiveByKey[key] = mergeColorValue(previousColorValue, entry);
+      effectiveByKey[key] = {
+        base: previous?.base,
+        override: mergeColorValue(previous?.override, entry),
+      };
     }
   }
 
@@ -171,11 +187,12 @@ function foldThemeColorChain(
 
 /**
  * Resolves a named theme into a fully-populated {@link ResolvedTheme} by
- * flattening its `extends` chain into one effective color definition per key,
- * then resolving each key — invoking {@link ColorSelector}s lazily against the
- * theme's own resolved colors so they can derive from (and track overrides of)
- * any other key. Selector invocations and color completeness are memoized per
- * key, and both inheritance cycles and selector reference cycles are detected.
+ * flattening its `extends` chain into one {@link EffectiveColor} per key, then
+ * resolving each key: the base {@link ColorSelector} (if any) is invoked lazily
+ * against the theme's own resolved colors — so it can derive from, and track
+ * overrides of, any other key — and the key's concrete overrides are then
+ * layered on top of its result. Resolution is memoized per key, and both
+ * inheritance cycles and selector reference cycles are detected.
  *
  * @param themes - The map of all available theme definitions.
  * @param themeName - The theme to resolve.
@@ -205,18 +222,15 @@ export function resolveTheme(
 
     resolvingKeys.add(key);
 
-    const definition = effectiveByKey[key];
-    const isRequired = isRequiredThemeColorKey(key);
-
-    const value = definition === undefined
-      ? undefined
-      : isColorSelector(definition)
-        ? definition(themeProxy)
-        : validateColorValue(themeName, `colors.${key}`, definition, isRequired);
-
-    if (value === undefined && isRequired) {
-      throw new Error(`Theme "${themeName}" is missing required color "colors.${key}".`);
-    }
+    const effective = effectiveByKey[key];
+    const baseValue = effective?.base?.(themeProxy);
+    const merged = mergeColorValue(baseValue, effective?.override);
+    const value = validateColorValue(
+      themeName,
+      `colors.${key}`,
+      merged,
+      isRequiredThemeColorKey(key),
+    );
 
     resolvingKeys.delete(key);
     resolvedByKey.set(key, value);
@@ -224,8 +238,36 @@ export function resolveTheme(
     return value;
   }
 
+  /**
+   * Resolves `key` for inspection (`in`, `Object.keys`, spreading), reporting a
+   * key that is still mid-resolution as absent instead of treating it as a
+   * cycle. A selector enumerating the palette is asking what is *available* to
+   * derive from, and the key it is itself computing is not — whereas reading
+   * that key outright (via `get`) is a genuine self-reference and still throws.
+   */
+  function inspectKey(key: string | symbol): ColorValue | undefined {
+    if (typeof key !== 'string' || resolvingKeys.has(key as ThemeColorKey)) {
+      return undefined;
+    }
+
+    return resolveKey(key as ThemeColorKey);
+  }
+
+  /**
+   * Resolves colors lazily on access, so a selector can read keys that have not
+   * been resolved yet. `getOwnPropertyDescriptor` must report `configurable`,
+   * since none of these keys exist on the target and the proxy invariants would
+   * otherwise reject them.
+   */
   const colorsProxy = new Proxy({} as ResolvedTheme['colors'], {
     get: (_target, key) => (typeof key === 'string' ? resolveKey(key as ThemeColorKey) : undefined),
+    has: (_target, key) => inspectKey(key) !== undefined,
+    ownKeys: () => THEME_COLOR_KEYS.filter((key) => inspectKey(key) !== undefined),
+    getOwnPropertyDescriptor: (_target, key) => {
+      const value = inspectKey(key);
+
+      return value ? { value, enumerable: true, configurable: true, writable: false } : undefined;
+    },
   });
   const themeProxy: ResolvedTheme = { colors: colorsProxy };
 

@@ -149,7 +149,7 @@ describe('resolveTheme', () => {
     expect(resolvedTheme.colors.bold?.dark).toBe('#bbbbbb');
   });
 
-  it('resolves a color selector against the theme\'s own resolved colors', () => {
+  it("resolves a color selector against the theme's own resolved colors", () => {
     const themes = defineThemes({
       parent: {
         colors: {
@@ -178,6 +178,59 @@ describe('resolveTheme', () => {
     // rather than sticking to the parent's value.
     expect(child.colors.bold?.light).toBe('#123456');
     expect(child.colors.bold?.dark).toBe('#654321');
+  });
+
+  it('layers a partial override onto the color a selector supplies', () => {
+    const themes = defineThemes({
+      parent: {
+        colors: {
+          ...COMPLETE_TEST_COLORS,
+          bold: (theme) => theme.colors.foreground,
+        },
+      },
+      child: {
+        extends: 'parent',
+        colors: {
+          bold: {
+            dark: '#ffffff',
+          },
+        },
+      },
+    });
+
+    const child = resolveTheme(themes, 'child');
+
+    // The override pins `dark`; the inherited selector still supplies the rest
+    // rather than being discarded wholesale.
+    expect(child.colors.bold?.dark).toBe('#ffffff');
+    expect(child.colors.bold?.light).toBe(COMPLETE_TEST_COLORS.foreground.light);
+    expect(child.colors.bold?.hcDark).toBe(COMPLETE_TEST_COLORS.foreground.hcDark);
+    expect(child.colors.bold?.hcLight).toBe(COMPLETE_TEST_COLORS.foreground.hcLight);
+  });
+
+  it('exposes resolved colors to a selector via `in` and `Object.keys`', () => {
+    let hasLink: boolean | undefined;
+    let keys: string[] | undefined;
+
+    const themes = defineThemes({
+      probe: {
+        colors: {
+          ...COMPLETE_TEST_COLORS,
+          bold: (theme) => {
+            hasLink = 'link' in theme.colors;
+            keys = Object.keys(theme.colors);
+            return theme.colors.foreground;
+          },
+        },
+      },
+    });
+
+    resolveTheme(themes, 'probe');
+
+    // `link` is never defined by this theme, so it must not be reported present.
+    expect(hasLink).toBe(false);
+    expect(keys).toContain('foreground');
+    expect(keys).not.toContain('link');
   });
 
   it('rejects color selector cycles', () => {

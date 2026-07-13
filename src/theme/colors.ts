@@ -50,6 +50,13 @@ export type CoreThemeColorKey = typeof CORE_THEME_COLOR_KEYS[number];
  * still modeled as terminal-agnostic theme colors so any generator can adopt
  * them — see {@link ColorSelector} for how a theme can derive one of these
  * from another resolved color instead of specifying it directly.
+ *
+ * Every theme must define all of these, whether directly or via a selector.
+ * iTerm2 keeps a profile's existing value for any key a preset omits, so a
+ * preset that leaves one of these out does not fall back to a sane default —
+ * it silently inherits a stale color from whatever preset was applied before
+ * it. `exportForIterm2` has a test asserting every built-in theme emits all of
+ * them.
  */
 export const EXTRA_THEME_COLOR_KEYS = [
   'bold',

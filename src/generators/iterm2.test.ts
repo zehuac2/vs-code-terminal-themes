@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from '@plist/plist';
-import { exportForIterm2 } from '@/generators/iterm2';
+import { EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR, exportForIterm2 } from '@/generators/iterm2';
 import { defineThemes, resolveTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
+import { DEFAULT_COLORS_BY_KIND } from '@/themes/palette';
+
+/** Independently encodes an opaque `#rrggbb` color the way an iTerm2 preset does. */
+function iterm2Color(hex: string): Record<string, number | string> {
+  return {
+    'Alpha Component': 1,
+    'Blue Component': parseInt(hex.slice(5, 7), 16) / 255,
+    'Color Space': 'sRGB',
+    'Green Component': parseInt(hex.slice(3, 5), 16) / 255,
+    'Red Component': parseInt(hex.slice(1, 3), 16) / 255,
+  };
+}
 
 describe('exportForIterm2', () => {
   it('exports core terminal colors, ansi colors, and iTerm2 extras', () => {
@@ -83,29 +95,43 @@ describe('exportForIterm2', () => {
       Record<string, number | string>
     >;
 
-    // These carry concrete values sourced from VS Code (see src/themes.ts), no
-    // longer synthesized from an ANSI palette color.
-    expect(plist['Badge Color (Light)']).toEqual({
-      'Alpha Component': 1,
-      'Blue Component': 0xcc / 255,
-      'Color Space': 'sRGB',
-      'Green Component': 0x7a / 255,
-      'Red Component': 0x00 / 255,
-    });
-    expect(plist['Link Color (Dark)']).toEqual({
-      'Alpha Component': 1,
-      'Blue Component': 0xff / 255,
-      'Color Space': 'sRGB',
-      'Green Component': 0x94 / 255,
-      'Red Component': 0x37 / 255,
-    });
-    expect(plist['Match Background Color (Dark)']).toEqual({
-      'Alpha Component': 1,
-      'Blue Component': 0x6a / 255,
-      'Color Space': 'sRGB',
-      'Green Component': 0x5c / 255,
-      'Red Component': 0x51 / 255,
-    });
+    // These carry concrete values from the palette (see src/themes/palette.ts),
+    // no longer synthesized from an ANSI palette color.
+    expect(plist['Badge Color (Light)']).toEqual(iterm2Color(DEFAULT_COLORS_BY_KIND.light.badge));
+    expect(plist['Link Color (Dark)']).toEqual(iterm2Color(DEFAULT_COLORS_BY_KIND.dark.link));
+    expect(plist['Match Background Color (Dark)']).toEqual(
+      iterm2Color(DEFAULT_COLORS_BY_KIND.dark.matchBackground),
+    );
+  });
+
+  // iTerm2 keeps a profile's existing value for any key a preset omits, so a
+  // theme that fails to define one of these extras does not fall back to a sane
+  // default — the key silently keeps its color from the last applied preset.
+  it.each(Object.keys(builtInThemes))(
+    'emits every extra color for the %s theme, so none can go stale',
+    (themeName) => {
+      const resolvedTheme = resolveTheme(builtInThemes, themeName);
+      const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
+
+      for (const colorName of Object.values(EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR)) {
+        expect(plist[colorName]).toBeDefined();
+        expect(plist[`${colorName} (Light)`]).toBeDefined();
+        expect(plist[`${colorName} (Dark)`]).toBeDefined();
+      }
+    },
+  );
+
+  it('keeps the High Contrast badge visible against its background', () => {
+    const resolvedTheme = resolveTheme(builtInThemes, 'High Contrast');
+    const plist = parse(exportForIterm2(resolvedTheme)) as Record<
+      string,
+      Record<string, number | string>
+    >;
+
+    // VS Code's hcDark activityBarBadge.background is #000000 — the same as the
+    // hcDark terminal background — which would render the badge text invisible.
+    expect(plist['Badge Color (Dark)']).not.toEqual(plist['Background Color (Dark)']);
+    expect(plist['Badge Color (Dark)']).toEqual(iterm2Color('#FFFFFF'));
   });
 
   it('composites translucent colors onto the active theme background', () => {
