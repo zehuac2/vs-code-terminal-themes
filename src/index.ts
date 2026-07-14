@@ -1,4 +1,3 @@
-import { resolveTheme } from '@/theme';
 import { exportForIterm2 } from '@/generators/iterm2';
 import { themes } from '@/themes';
 import { exportForWarp, WARP_COLOR_VARIANTS } from '@/generators/warp';
@@ -25,9 +24,8 @@ function toWarpFileNamePart(displayName: string): string {
 
 await $`rm -rf ${GENERATED_DIR}`.quiet();
 
-for (const [themeName, definition] of Object.entries(themes)) {
-  const theme = resolveTheme(themes, themeName);
-  const displayName = definition.displayName ?? themeName;
+for (const [, theme] of Object.entries(themes)) {
+  const displayName = theme.displayName;
   const iterm2FileName = `VSCode ${displayName}.itermcolors`;
   const iterm2FilePath = `${ITERM_GENERATED_DIR}/${iterm2FileName}`;
 

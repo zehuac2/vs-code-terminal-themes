@@ -6,7 +6,7 @@ export type ThemeKind = 'light' | 'dark' | 'hcDark' | 'hcLight';
  * Theme colors with a literal per-kind default. Excludes the
  * selector-backed extras (`bold`, `underline`, `cursorGuide`), which have no
  * VS Code color of their own and instead derive from another resolved color —
- * see {@link EXTRA_SELECTOR_COLORS}.
+ * see `withExtras` in `./builders`.
  */
 export type DefaultThemeColorKey = Exclude<ThemeColorKey, 'bold' | 'underline' | 'cursorGuide'>;
 

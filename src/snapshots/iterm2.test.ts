@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { exportForIterm2 } from '@/generators/iterm2';
-import { resolveTheme } from '@/theme';
 import { themes } from '@/themes';
 
 describe('iTerm2 preset snapshots', () => {
-  Object.keys(themes).map((themeName) => {
+  Object.entries(themes).map(([themeName, theme]) => {
     it(themeName, () => {
-      expect(exportForIterm2(resolveTheme(themes, themeName), 'object')).toMatchSnapshot();
+      expect(exportForIterm2(theme, 'object')).toMatchSnapshot();
     });
   });
 });
