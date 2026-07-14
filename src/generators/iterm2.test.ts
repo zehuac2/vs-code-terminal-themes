@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from '@plist/plist';
 import { EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR, exportForIterm2 } from '@/generators/iterm2';
-import { defineThemes, resolveTheme } from '@/theme';
+import { type ResolvedTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
 import { DEFAULT_COLORS_BY_KIND } from '@/themes/palette';
 
@@ -18,32 +18,27 @@ function iterm2Color(hex: string): Record<string, number | string> {
 
 describe('exportForIterm2', () => {
   it('exports core terminal colors, ansi colors, and iTerm2 extras', () => {
-    const themes = defineThemes({
-      ...builtInThemes,
-      child: {
-        extends: 'Plus',
-        colors: {
-          ansiBlue: {
-            dark: '#010203',
-          },
-          selectionBackground: {
-            light: '#111111',
-            dark: '#222222',
-            hcDark: '#333333',
-            hcLight: '#444444',
-          },
-          bold: {
-            light: '#aaaaaa',
-            dark: '#bbbbbb',
-            hcDark: '#cccccc',
-            hcLight: '#dddddd',
-          },
+    const base = builtInThemes.Plus.colors;
+    const child = {
+      colors: {
+        ...base,
+        ansiBlue: { ...base.ansiBlue, dark: '#010203' },
+        selectionBackground: {
+          light: '#111111',
+          dark: '#222222',
+          hcDark: '#333333',
+          hcLight: '#444444',
+        },
+        bold: {
+          light: '#aaaaaa',
+          dark: '#bbbbbb',
+          hcDark: '#cccccc',
+          hcLight: '#dddddd',
         },
       },
-    });
+    } satisfies ResolvedTheme;
 
-    const resolvedTheme = resolveTheme(themes, 'child');
-    const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
+    const plist = parse(exportForIterm2(child)) as Record<string, unknown>;
 
     expect(plist['Ansi 4 Color']).toBeDefined();
     expect(plist['Ansi 4 Color (Light)']).toBeDefined();
@@ -71,8 +66,8 @@ describe('exportForIterm2', () => {
     expect(plist['Underline Color']).toBeDefined();
   });
 
-  it('derives bold, underline, and cursor guide from the theme via selectors', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
+  it('derives bold, underline, and cursor guide from the theme', () => {
+    const resolvedTheme = builtInThemes.Plus;
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
 
     expect(plist['Bold Color']).toEqual(plist['Foreground Color']);
@@ -89,7 +84,7 @@ describe('exportForIterm2', () => {
   });
 
   it('uses the theme-defined VS Code-sourced colors for badge, link, and match background', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, 'Plus');
+    const resolvedTheme = builtInThemes.Plus;
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<
       string,
       Record<string, number | string>
@@ -110,7 +105,7 @@ describe('exportForIterm2', () => {
   it.each(Object.keys(builtInThemes))(
     'emits every extra color for the %s theme, so none can go stale',
     (themeName) => {
-      const resolvedTheme = resolveTheme(builtInThemes, themeName);
+      const resolvedTheme = builtInThemes[themeName as keyof typeof builtInThemes];
       const plist = parse(exportForIterm2(resolvedTheme)) as Record<string, unknown>;
 
       for (const colorName of Object.values(EXTRA_ITERM2_COLOR_NAME_BY_THEME_COLOR)) {
@@ -122,7 +117,7 @@ describe('exportForIterm2', () => {
   );
 
   it('keeps the High Contrast badge visible against its background', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, 'High Contrast');
+    const resolvedTheme = builtInThemes['High Contrast'];
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<
       string,
       Record<string, number | string>
@@ -135,7 +130,7 @@ describe('exportForIterm2', () => {
   });
 
   it('composites translucent colors onto the active theme background', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, '2026');
+    const resolvedTheme = builtInThemes['2026'];
     const plist = parse(exportForIterm2(resolvedTheme)) as Record<
       string,
       Record<string, number | string>

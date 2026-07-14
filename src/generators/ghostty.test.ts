@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import { exportForGhostty, type GhosttyExportObject } from '@/generators/ghostty';
-import { defineThemes, resolveTheme } from '@/theme';
+import { exportForGhostty } from '@/generators/ghostty';
+import { type ResolvedTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
 
 describe('exportForGhostty', () => {
   it('exports core colors and the 16-entry ANSI palette', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, '2026');
-    const config = exportForGhostty(resolvedTheme, { variant: 'dark' });
+    const config = exportForGhostty(builtInThemes['2026'], { variant: 'dark' });
 
     expect(config).toContain('background = #191A1B');
     expect(config).toContain('foreground = #CCCCCC');
@@ -18,24 +17,17 @@ describe('exportForGhostty', () => {
   });
 
   it('exports only 24-bit colors by flattening alpha onto the variant background', () => {
-    const themes = defineThemes({
-      ...builtInThemes,
-      child: {
-        extends: '2026',
-        colors: {
-          ansiBlue: {
-            dark: '#3994BC33',
-          },
-          background: {
-            dark: '#191A1B',
-          },
-        },
+    const base = builtInThemes['2026'].colors;
+    const child = {
+      colors: {
+        ...base,
+        ansiBlue: { ...base.ansiBlue, dark: '#3994BC33' },
+        background: { ...base.background, dark: '#191A1B' },
       },
-    });
+    } satisfies ResolvedTheme;
 
-    const resolvedTheme = resolveTheme(themes, 'child');
-    const config = exportForGhostty(resolvedTheme, { variant: 'dark' });
-    const object = exportForGhostty(resolvedTheme, { variant: 'dark' }, 'object');
+    const config = exportForGhostty(child, { variant: 'dark' });
+    const object = exportForGhostty(child, { variant: 'dark' }, 'object');
 
     expect(config).not.toContain('#3994BC33');
     // palette index 4 = ansiBlue

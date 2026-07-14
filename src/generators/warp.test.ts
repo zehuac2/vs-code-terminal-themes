@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 import { parse } from 'yaml';
 import { exportForWarp, type WarpExportObject } from '@/generators/warp';
-import { defineThemes, resolveTheme } from '@/theme';
+import { type ResolvedTheme } from '@/theme';
 import { themes as builtInThemes } from '@/themes';
 
 describe('exportForWarp', () => {
   it('exports core colors and normal and bright ANSI colors', () => {
-    const resolvedTheme = resolveTheme(builtInThemes, '2026');
-    const yaml = exportForWarp(resolvedTheme, { name: 'VS Code Dark', variant: 'dark' });
+    const yaml = exportForWarp(builtInThemes['2026'], { name: 'VS Code Dark', variant: 'dark' });
     const warpTheme = parse(yaml) as WarpExportObject;
 
     expect(warpTheme.name).toBe('VS Code Dark');
@@ -21,23 +20,16 @@ describe('exportForWarp', () => {
   });
 
   it('exports only 24-bit colors by flattening alpha onto the variant background', () => {
-    const themes = defineThemes({
-      ...builtInThemes,
-      child: {
-        extends: '2026',
-        colors: {
-          ansiBlue: {
-            dark: '#3994BC33',
-          },
-          background: {
-            dark: '#191A1B',
-          },
-        },
+    const base = builtInThemes['2026'].colors;
+    const child = {
+      colors: {
+        ...base,
+        ansiBlue: { ...base.ansiBlue, dark: '#3994BC33' },
+        background: { ...base.background, dark: '#191A1B' },
       },
-    });
+    } satisfies ResolvedTheme;
 
-    const resolvedTheme = resolveTheme(themes, 'child');
-    const yaml = exportForWarp(resolvedTheme, { name: 'Child Dark', variant: 'dark' });
+    const yaml = exportForWarp(child, { name: 'Child Dark', variant: 'dark' });
     const warpTheme = parse(yaml) as WarpExportObject;
 
     expect(yaml).not.toContain('#3994BC33');
