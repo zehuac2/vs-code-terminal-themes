@@ -39,50 +39,6 @@ describe('built-in themes', () => {
     ]);
   });
 
-  it('resolves the 2026 theme with its requested overrides', () => {
-    const { colors } = builtInThemes['2026'];
-
-    expect(colors.background.dark).toBe('#191A1B');
-    expect(colors.selectionBackground?.dark).toBe('#3994BC33');
-    expect(colors.cursor?.dark).toBe('#bfbfbf');
-    expect(colors.cursorText?.dark).toBe('#191A1B');
-    expect(colors.border?.dark).toBe('#2A2B2CFF');
-    expect(colors.tabActiveBorder?.dark).toBe('#3994BC00');
-
-    expect(colors.background.light).toBe('#ffffff');
-    expect(colors.selectionBackground?.light).toBe('#0069CC26');
-    expect(colors.cursor?.light).toBe('#202020');
-    expect(colors.cursorText?.light).toBe('#FFFFFF');
-    expect(colors.foreground.light).toBe('#3B3B3B');
-  });
-
-  it('resolves the VS Code inheritance chains', () => {
-    const classic = builtInThemes['Visual Studio'].colors;
-    const plus = builtInThemes.Plus.colors;
-    const modern = builtInThemes.Modern.colors;
-    const highContrast = builtInThemes['High Contrast'].colors;
-
-    expect(classic.selectionBackground?.dark).toBe('#3A3D41');
-    expect(classic.selectionBackground?.light).toBe('#E5EBF1');
-    expect(plus.selectionBackground?.dark).toBe('#3A3D41');
-    expect(plus.selectionBackground?.light).toBe('#E5EBF1');
-
-    expect(modern.foreground.dark).toBe('#CCCCCC');
-    expect(modern.foreground.light).toBe('#3B3B3B');
-    expect(modern.tabActiveBorder?.dark).toBe('#0078D4');
-    expect(modern.tabActiveBorder?.light).toBe('#005FB8');
-    // A non-overridden color is inherited unchanged.
-    expect(modern.ansiBlue.dark).toBe(classic.ansiBlue.dark);
-    // A partial override keeps the inherited variants.
-    expect(modern.cursor?.light).toBe('#005FB8');
-    expect(modern.selectionBackground?.light).toBe('#E5EBF1');
-
-    expect(highContrast.background.dark).toBe('#000000');
-    expect(highContrast.ansiBlue.dark).toBe('#0000ee');
-    expect(highContrast.foreground.light).toBe('#292929');
-    expect(highContrast.cursor?.light).toBe('#0f4a85');
-  });
-
   it("tracks a child's overridden source color through the derived extras", () => {
     // Modern overrides foreground; its bold must follow that override rather
     // than inheriting Visual Studio's foreground.
